@@ -3,8 +3,21 @@ const ParkingModel = require('../../models/parking.model')
 
 exports.viewParkingList = async (req, res) => {
   try {
+    const {latitude} = req.query
+    const {longitude} =req.query
     console.log("testing...1");
-    const parkings = await ParkingModel.find();
+    console.log(req.query)
+    const parkings = await ParkingModel.find({
+        location: {
+           $near: {
+              $geometry: {
+                 type: "Point",
+                 coordinates: [  latitude, longitude ]
+              },
+              $maxDistance : 500000
+           }
+        }
+     });
     console.log("testing...2",parkings);
     res.status(200).json({
       success: true,

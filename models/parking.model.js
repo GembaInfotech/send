@@ -162,7 +162,7 @@ const ParkingSchema = new Schema(
   }
 );
 
-
+ParkingSchema.index({location: "2dsphere"})
 const ParkingModel = mongoose.model('ParkingModel', ParkingSchema);
 
 
