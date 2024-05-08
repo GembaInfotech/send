@@ -18,6 +18,7 @@ const search = require("./controllers/search.controller");
 const Database = require("./config/database");
 const decodeToken = require("./middlewares/auth/decodeToken");
 const vehcileRoutes = require('./routes/vehicle.route.js')
+const parkingRoutes = require('./routes/parking.route.js')
 
 const app = express();
 
@@ -60,7 +61,8 @@ app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/communities", communityRoutes);
 app.use("/admin", adminRoutes);
-app.use("/vehicle", vehcileRoutes)
+app.use("/vehicle", vehcileRoutes);
+app.use("/parking", parkingRoutes)
 
 process.on("SIGINT", async () => {
   try {
