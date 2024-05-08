@@ -25,7 +25,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const passport = require("passport");
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4005;
 
 const db = new Database(process.env.MONGODB_URI, {
   useNewUrlParser: true,

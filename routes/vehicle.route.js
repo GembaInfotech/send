@@ -7,7 +7,7 @@ const requireAuth = passport.authenticate("jwt", { session: false }, null);
 
 const vehicleController = require('../controllers/vehicle.controller')
 
-router.route('/create-new-vehicle').post( vehicleController.create_new_vehicle);
+router.route('/create-new-vehicle').post( decodeToken,  vehicleController.create_new_vehicle);
 
   router.route('update-vehicle/:vehicleId').put( vehicleController.update_vehicle);
 

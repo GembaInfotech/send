@@ -1,11 +1,13 @@
 const UserModel = require('../../models/user.model');
 
 exports.createVehicle = async (req, res) => {
-    const userId = req.user;
-    const { vehicle_name, vehicle_number, vehicle_type } = req.body;
+     const {vehicle} =req.body;
+    const userId = req.userId;
+    console.log(userId)
+    const { vehicle_name, vehicle_number, vehicle_type } = vehicle;
   
     try {
-      const user = await UserModel.findOne({uniqueId:userId});
+      const user = await UserModel.findOne({_id:userId});
       if (!user) {
         return res.status(404).json({
           success: false,
