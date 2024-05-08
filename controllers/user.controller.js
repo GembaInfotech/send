@@ -249,7 +249,13 @@ const signin = async (req, res, next) => {
  * @param req - Express request object
  * @param res - Express response object
  * @param {Function} next - Express next function
+ * 
+ * 
+ * 
  */
+
+
+
 const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select("-password").lean();
@@ -316,7 +322,11 @@ const getUser = async (req, res, next) => {
  * @param {Object} req.files - The files attached to the request object (for avatar).
  * @param {string} req.body.isConsentGiven - Indicates whether the user has given consent to enable context based auth.
  * @param {Function} next - The next middleware function to call if consent is given by the user to enable context based auth.
+ * 
+ * 
  */
+
+
 const addUser = async (req, res, next) => {
   let newUser;
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -487,11 +497,18 @@ const updateInfo = async (req, res) => {
       });
     }
 
-    const { location, interests, bio } = req.body;
+    const { name, contact, address, city, pincode, state, country, licence_no } = req.body;
 
-    user.location = location;
-    user.interests = interests;
-    user.bio = bio;
+    user.name = name;
+    user.contact = contact;
+    user.address = address;
+    user.city = city;
+    user.pincode = pincode;
+    user.state = state;
+    user.country = country;
+    user.licence_no = licence_no;
+
+
 
     await user.save();
 

@@ -4,6 +4,7 @@ const useragent = require("express-useragent");
 const requestIp = require("request-ip");
 
 const {
+  
   addUser,
   signin,
   logout,
@@ -40,8 +41,10 @@ const {
 const decodeToken = require("../middlewares/auth/decodeToken");
 const requireAuth = passport.authenticate("jwt", { session: false }, null);
 
+
+// router.post("/create-new-user", createUser)
 router.get("/public-users/:id", requireAuth, decodeToken, getPublicUser);
-router.get("/public-users", requireAuth, decodeToken, getPublicUsers);
+router.get("/public-users",  getPublicUsers);
 router.get("/moderator", requireAuth, decodeToken, getModProfile);
 router.get("/following", requireAuth, decodeToken, getFollowingUsers);
 router.get("/:id", requireAuth, getUser);
