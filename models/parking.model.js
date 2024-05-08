@@ -88,14 +88,18 @@ const ParkingSchema = new Schema(
         max:200,
         required: false,
       },
-      latitude: {
-        type: Number,
-        
+      location: {
+        type: {
+          type: String, // Don't do `{ location: { type: String } }`
+          enum: ['Point'], // 'location.type' must be 'Point'
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
       },
-      longitude: {
-        type: Number,
-        
-      },      price_for: {
+      price_for: {
         type: Number,
         min:30,
         max:480,

@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-
-// Define booking schema
 const bookingSchema = new mongoose.Schema({
   userid: {
     type: mongoose.Schema.Types.ObjectId,
@@ -32,8 +30,8 @@ const bookingSchema = new mongoose.Schema({
   totalPrice: Number,
   status: {
     type: String,
-    enum: ["Incoming", "Parked", "Completed"],
-    default: "Incoming",
+    enum: ["Pending","Incoming", "Parked", "Completed"],
+    default: "Pending",
   },
 });
 
