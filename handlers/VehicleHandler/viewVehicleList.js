@@ -2,7 +2,7 @@ const User = require('../../models/user.model');
 
 exports.viewVehicleList = async (req, res) => {
     console.log("helloo");
-    const userId = req.user
+    const userId = req.userId
     console.log("helloo");
     try {
         console.log("hello");

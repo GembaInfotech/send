@@ -1,11 +1,11 @@
 const User = require('../../models/user.model');
 
 exports.deleteVehicle = async (req, res) => {
-    const userId = req.user;
+    const userId = req.userId;
     const vehicleId = req.params.vehicleId; 
   
     try {
-      const user = await UserModel.findOne({uniqueId:userId});
+      const user = await UserModel.findOne({_id:userId});
       if (!user) {
         return res.status(404).json({
           success: false,
