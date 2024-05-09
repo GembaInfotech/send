@@ -2,7 +2,6 @@ const VendorModel = require('../../models/vendor.model');
 
 exports.viewVendorList = async (req, res) => {
   try {
-    // Fetch all vendors from the database
     const vendors = await VendorModel.find();
 
     if (!vendors || vendors.length === 0) {
