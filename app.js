@@ -20,6 +20,7 @@ const decodeToken = require("./middlewares/auth/decodeToken");
 const vehcileRoutes = require('./routes/vehicle.route.js')
 const parkingRoutes = require('./routes/parking.route.js')
 const bookingRoutes = require("./routes/booking.route.js")
+const vendorRoute = require('./routes/vendor.route.js')
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use("/admin", adminRoutes);
 app.use("/vehicle", vehcileRoutes);
 app.use("/parking", parkingRoutes)
 app.use("/booking", bookingRoutes)
+app.use("/vendor", vendorRoute)
 
 
 process.on("SIGINT", async () => {

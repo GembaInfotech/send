@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const jwt = require('jsonwebtoken');
-const { format } = require('date-fns');
+// const { format } = require('date-fns');
 
 const VendorSchema = new Schema(
   {
