@@ -5,6 +5,7 @@ const vendorToken = require("../models/vendorToken.model")
 const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
+const { findOne } = require('../models/parking.model');
 dayjs.extend(duration);
 
 const LOG_TYPE = {
@@ -83,7 +84,7 @@ const LOG_TYPE = {
       console.log("testing...1");
   
       const accessToken = jwt.sign(payload, process.env.SECRET, {
-        expiresIn: "2m",
+        expiresIn: "10m",
       });
   
       const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET, {
@@ -159,36 +160,44 @@ const LOG_TYPE = {
 
   const getVendor = async (req, res, next) => {
     try {
-      const vendor = await vendorModel.findById(req.params.id).select("-password").lean();
-  
-     
-  
-   
+      const id = req.userId
+      const vendor = await vendorModel.findById(id).select("-password").lean();
       res.status(200).json(vendor);
     } catch (err) {
       next(err);
     }
   };
 
-
-const addVendor = async (req, res, next) => {
+  const addVendor = async (req, res, next) => {
     let newVendor;
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+    try {
+      const existingVendor = await vendorModel.findOne({ email: req.body.email });
+      if (existingVendor) {
+        return res.status(400).json({
+          message: "Email already exists",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Error checking email",
+      });
+    }
+  
     newVendor = new vendorModel({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
       role: req.body.role,
-   
     });
     
     try {
       await newVendor.save();
       res.status(200).json({
-       data:newVendor
+        data: newVendor,
       });
-  
     } catch (err) {
       console.log(err)
       res.status(400).json({
@@ -196,7 +205,71 @@ const addVendor = async (req, res, next) => {
       });
     }
   };
+  
 
+  const updateVendor = async (req, res, next) => {
+    try {
+      const id = req.userId;
+      const updateData = req.body; // Assuming the update data is sent in the request body
+      
+      // Update the vendor document
+      const updatedVendor = await vendorModel.findByIdAndUpdate(id, updateData, { new: true }).select("-password").lean();
+      
+      // Check if the vendor was found and updated
+      if (!updatedVendor) {
+        return res.status(404).json({ message: "Vendor not found" });
+      }
+      
+      // Send the updated vendor data as response
+      res.status(200).json(updatedVendor);
+    } catch (err) {
+      next(err);
+    }
+  };
+  
+  const updateVendorStatus = async (req, res, next) => {
+    try {
+      const id = req.userId;
+      const { vendorStatus } = req.body; // Assuming the new status is provided in the request body
+  
+      // Find the vendor document by ID and update its status
+      const updatedVendor = await vendorModel.findByIdAndUpdate(
+        id,
+        { vendorStatus },
+        { new: true }
+      ).select("-password").lean();
+  
+      // Check if the vendor was found and updated
+      if (!updatedVendor) {
+        return res.status(404).json({ message: "Vendor not found" });
+      }
+  
+      // Send the updated vendor data as response
+      res.status(200).json(updatedVendor);
+    } catch (err) {
+      next(err);
+    }
+  };
+  
+
+  const getAllVendor = async (req, res, next) => {
+    try {
+      // Retrieve all vendors from the database
+      const vendors = await vendorModel.find().select("-password").lean();
+  
+      // Check if any vendors were found
+      if (vendors.length === 0) {
+        return res.status(404).json({ message: "No vendors found" });
+      }
+  
+      // Send the list of vendors as response
+      res.status(200).json(vendors);
+    } catch (err) {
+      next(err);
+    }
+  };
+  
+  
 
  
 
@@ -204,5 +277,8 @@ const addVendor = async (req, res, next) => {
     addVendor,
     signin,
     getVendor,
-    logout
+    logout,
+    updateVendor,
+    updateVendorStatus,
+    getAllVendor
   };
