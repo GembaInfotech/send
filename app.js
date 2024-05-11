@@ -9,7 +9,7 @@
 
 require("dotenv").config();
 const express = require("express");
-
+const bodyParser = require('body-parser')
 const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
 const postRoutes = require("./routes/post.route");
@@ -43,11 +43,10 @@ db.connect().catch((err) =>
 
 app.use(cors());
 app.use(morgan("dev"));
-app.use("/assets/userFiles", express.static(__dirname + "/assets/userFiles"));
-app.use(
-  "/assets/userAvatars",
-  express.static(__dirname + "/assets/userAvatars")
-);
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.json({limit: "16kb"}))
+app.use(express.urlencoded({extended: true, limit: "16kb"}))
+app.use(express.static('build'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -70,8 +69,6 @@ app.use("/parking", parkingRoutes)
 app.use("/booking", bookingRoutes)
 app.use("/vendor", vendorRoute)
 // app.use("/booking", paymentRoute)
-
-
 
 process.on("SIGINT", async () => {
   try {

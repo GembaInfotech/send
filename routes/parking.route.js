@@ -8,9 +8,12 @@ const decodeToken = require("../middlewares/auth/decodeToken");
 
   router.route('/create-new-parking').post(decodeToken, parkingController.create_new_parking);
   router.route('/get-vendor-parkings').get(decodeToken, parkingController.get_vendor_parkings);
+  router.route('/get-parking/:parkingId').get(parkingController.get_parking_by_parkingId);
+
   router.route('/search').get(parkingController.view_Parking_list);
 
   router.route('/update-parking/:parking_id').put(decodeToken, parkingController.update_parking);
+  
 
   router.route('/update-parking-status/:parking_id').put(decodeToken, parkingController.update_parking_status)
 
