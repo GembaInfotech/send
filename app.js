@@ -9,6 +9,7 @@
 
 require("dotenv").config();
 const express = require("express");
+
 const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
 const postRoutes = require("./routes/post.route");
@@ -21,6 +22,7 @@ const vehcileRoutes = require('./routes/vehicle.route.js')
 const parkingRoutes = require('./routes/parking.route.js')
 const bookingRoutes = require("./routes/booking.route.js")
 const vendorRoute = require('./routes/vendor.route.js')
+const paymentRoute = require('./routes/paymentRoute.js')
 
 const app = express();
 
@@ -67,6 +69,8 @@ app.use("/vehicle", vehcileRoutes);
 app.use("/parking", parkingRoutes)
 app.use("/booking", bookingRoutes)
 app.use("/vendor", vendorRoute)
+app.use("/booking", paymentRoute)
+
 
 
 process.on("SIGINT", async () => {

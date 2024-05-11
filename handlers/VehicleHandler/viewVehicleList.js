@@ -18,11 +18,8 @@ exports.viewVehicleList = async (req, res) => {
         const vehicleList = user.vehicle;
         console.log(vehicleList);
 
-        res.status(200).json({
-            success: true,
-            message: 'Vehicle list retrieved successfully',
-            data: vehicleList,
-        });
+        res.status(200).json( vehicleList,
+        );
     } catch (error) {
         console.error(error);
         res.status(500).json({
