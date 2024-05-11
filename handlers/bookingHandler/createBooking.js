@@ -2,30 +2,58 @@ const Booking = require('../../models/booking.model');
 
 exports.createBooking = async (req, res) => {
   try {
+    const user = req.userId;
+    console.log(user);
     const {
-      parkingid,
+      
+      parking,
       inTime,
       outTime,
-      status,
+      actualInTime,
+      actualOutTime,
+      duration,
+      actualDuration,
+      BookingDate,
+      exceedTime,
       vehicleNumber,
       parkingName,
       price,
       cgst,
       sgst,
-      totalPrice
-    } = req.body.bookingData;
+      exceedPrice,
+      exceedCGST,
+      exceedSGST,
+      exceedTotalPrice,
+      totalPrice,
+      bookingPrice,
+      paymentId,
+      status
+    } = req.body;
 
     const newBooking = new Booking({
-      parkingid,
+      user,
+      parking,
+      parkingName,
       inTime,
       outTime,
-      status,
+      actualInTime,
+      actualOutTime,
+      duration,
+      actualDuration,
+      BookingDate,
+      exceedTime,
       vehicleNumber,
-      parkingName,
       price,
       cgst,
       sgst,
-      totalPrice
+      exceedPrice,
+      exceedCGST,
+      exceedSGST,
+      exceedTotalPrice,
+      totalPrice,
+      bookingPrice,
+      paymentId,
+      status
     });
 
     // Save the booking
@@ -38,4 +66,3 @@ exports.createBooking = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
