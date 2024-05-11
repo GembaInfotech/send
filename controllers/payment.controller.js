@@ -1,5 +1,6 @@
-const  razorpay = require( "razorpay");
+const  Razorpay = require( "razorpay");
 const crypto =require('crypto')
+const razorpay = require('../config/razorpay')
 const Booking = require('../models/booking.model')
 exports.sayHello = async (req, res) => {
   try {
@@ -17,12 +18,12 @@ exports.createPaymentLink = async (req, res) => {
      
      const order = await Booking.findById(req.params.id);
      const paymentLinkRequest = {
-       amount:  2400,
+       amount:  order.price*100,
        currency: 'INR',
       
       
        reminder_enable: true,
-       // callback_url: `http://localhost:5174/profile/bookings`,
+        callback_url: `http://localhost:3000/payment-success`,
        callback_method: 'get',
      };
 

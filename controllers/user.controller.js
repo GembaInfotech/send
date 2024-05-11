@@ -446,7 +446,7 @@ const refreshToken = async (req, res) => {
     };
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
-      expiresIn: "2m",
+      expiresIn: "10m",
     });
 
     res.status(200).json({

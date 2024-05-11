@@ -69,7 +69,7 @@ app.use("/vehicle", vehcileRoutes);
 app.use("/parking", parkingRoutes)
 app.use("/booking", bookingRoutes)
 app.use("/vendor", vendorRoute)
-app.use("/booking", paymentRoute)
+// app.use("/booking", paymentRoute)
 
 
 
