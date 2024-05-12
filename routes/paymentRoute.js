@@ -6,7 +6,7 @@ const paymentController = require("../controllers/payment.controller")
 router.route("/hello").get(paymentController.sayHello);
 router.route("/order").post(paymentController.order);
 router.route("/order/validate").post(paymentController.validate);
-router.route("/payments/:id").post(paymentController.createPaymentLink);     
+router.route("/:id").post(paymentController.createPaymentLink);     
 
 
 
