@@ -1,5 +1,6 @@
-const  razorpay = require( "razorpay");
+const  Razorpay = require( "razorpay");
 const crypto =require('crypto')
+const razorpay = require('../config/razorpay')
 const Booking = require('../models/booking.model')
 exports.sayHello = async (req, res) => {
   try {
@@ -17,12 +18,12 @@ exports.createPaymentLink = async (req, res) => {
      
      const order = await Booking.findById(req.params.id);
      const paymentLinkRequest = {
-       amount:  2400,
+       amount:  order.price*100,
        currency: 'INR',
       
       
        reminder_enable: true,
-       // callback_url: `http://localhost:5174/profile/bookings`,
+        callback_url: `http://localhost:3000/payment-success`,
        callback_method: 'get',
      };
 
@@ -73,25 +74,27 @@ exports.order  = async (req, res) => {
 }
 
 exports.validate = async(req, res)=>{
-    // const {razorpay_order_id, razorpay_payment_id, razorpay_signature} =req.body;
-    // console.log(req.body);
-    // const sha = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
-    // sha.update(`${razorpay_order_id}|${razorpay_payment_id}`)
-    // const digest = sha.digest("hex");
-    // if(digest!==razorpay_signature){
-    //     return res.status(400).json({msg: "Transaction inj not legit!"});
-    // }
-    // res.json({
-    //     msg:"success",
-    //     orderId:razorpay_order_id,
-    //     paymentId:razorpay_payment_id
+    const {razorpay_order_id, razorpay_payment_id, razorpay_signature} =req.body;
+    console.log(req.body);
 
-    // })
+    const sha = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
+    sha.update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    
+   
     const data = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET)
-
+    const digest = data.digest('hex')
+   try{
+    if(digest!==razorpay_signature){
+        console.log(digest)
+        return res.status(400).json({msg: "Transaction not legit!"});
+    }
+   }
+   catch(err)
+   {console.log(err)
+    return res.json({msg:msg})
+   }
    data.update(JSON.stringify(req.body))
 
-   const digest = data.digest('hex')
 
 if (digest === req.headers['x-razorpay-signature']) {
 
@@ -100,10 +103,11 @@ if (digest === req.headers['x-razorpay-signature']) {
        //We can send the response and store information in a database.
 
        res.json({
+        msg:"success",
+        orderId:razorpay_order_id,
+        paymentId:razorpay_payment_id
 
-           status: 'ok'
-
-       })
+    })
 
 } else {
 
