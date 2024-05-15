@@ -6,6 +6,9 @@ const bookingSchema = new mongoose.Schema({
   parking: {
     type: String 
   },
+  parkingName:{
+    type:String
+  },
   inTime: {
     type: Date,
   },
