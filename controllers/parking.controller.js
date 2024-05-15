@@ -40,6 +40,13 @@ exports.create_new_parking = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   };
+  exports.get_Parking = async (req, res) => {
+    try {
+      await getParking(req, res);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
 
 
   exports.update_parking = async (req, res) => {
