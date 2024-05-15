@@ -32,6 +32,8 @@ const LOG_TYPE = {
   };
   
   const signin = async (req, res, next) => {
+    console.log("hello");
+    console.log(req.body);
     await saveLogInfo(
       req,
       MESSAGE.SIGN_IN_ATTEMPT,
@@ -41,6 +43,7 @@ const LOG_TYPE = {
   
     try {
       const { email, password } = req.body;
+      console.log(req.body);
       const existingVendor = await vendorModel.findOne({
         email: { $eq: email },
       });
@@ -139,7 +142,7 @@ const LOG_TYPE = {
       const refreshToken = req.headers.authorization?.split(" ")[1] ?? null;
       console.log(req.headers.authorization)
       if (refreshToken) {
-        await Token.deleteOne({ refreshToken });
+        await vendorToken.deleteOne({ refreshToken });
         await saveLogInfo(
           null,
           MESSAGE.LOGOUT_SUCCESS,
@@ -148,7 +151,7 @@ const LOG_TYPE = {
         );
       }
       res.status(200).json({
-        message: "Logout successful",
+        message: "Vendor Logout successful",
       });
     } catch (err) {
       await saveLogInfo(null, err.message, LOG_TYPE.LOGOUT, LEVEL.ERROR);
@@ -160,6 +163,7 @@ const LOG_TYPE = {
 
   const getVendor = async (req, res, next) => {
     try {
+      console.log("hello");
       const id = req.userId
       const vendor = await vendorModel.findById(id).select("-password").lean();
       res.status(200).json(vendor);
@@ -169,58 +173,41 @@ const LOG_TYPE = {
   };
 
   const addVendor = async (req, res, next) => {
-    let newVendor;
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    try {
+        const vendorData = { ...req.body };
+        const existingVendor = await vendorModel.findOne({ email: vendorData.email });
+        if (existingVendor) {
+            return res.status(400).json({
+                message: "Email already exists",
+            });
+        }
+        const hashedPassword = await bcrypt.hash(vendorData.password, 10);
 
-    try {
-      const existingVendor = await vendorModel.findOne({ email: req.body.email });
-      if (existingVendor) {
-        return res.status(400).json({
-          message: "Email already exists",
+        const newVendor = new vendorModel({
+            ...vendorData,
+            password: hashedPassword,
         });
-      }
+        await newVendor.save();
+        res.status(200).json({
+            data: newVendor,
+        });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({
-        message: "Error checking email",
-      });
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to add Vendor",
+        });
     }
-  
-    newVendor = new vendorModel({
-      name: req.body.name,
-      email: req.body.email,
-      password: hashedPassword,
-      role: req.body.role,
-    });
-    
-    try {
-      await newVendor.save();
-      res.status(200).json({
-        data: newVendor,
-      });
-    } catch (err) {
-      console.log(err)
-      res.status(400).json({
-        message: "Failed to add Vendor",
-      });
-    }
-  };
-  
+};
 
   const updateVendor = async (req, res, next) => {
     try {
       const id = req.userId;
-      const updateData = req.body; // Assuming the update data is sent in the request body
+      const updateData = req.body.data; 
       
-      // Update the vendor document
       const updatedVendor = await vendorModel.findByIdAndUpdate(id, updateData, { new: true }).select("-password").lean();
-      
-      // Check if the vendor was found and updated
       if (!updatedVendor) {
         return res.status(404).json({ message: "Vendor not found" });
       }
-      
-      // Send the updated vendor data as response
       res.status(200).json(updatedVendor);
     } catch (err) {
       next(err);
@@ -230,49 +217,85 @@ const LOG_TYPE = {
   const updateVendorStatus = async (req, res, next) => {
     try {
       const id = req.userId;
-      const { vendorStatus } = req.body; // Assuming the new status is provided in the request body
-  
-      // Find the vendor document by ID and update its status
+      const { vendorStatus } = req.body; 
       const updatedVendor = await vendorModel.findByIdAndUpdate(
         id,
         { vendorStatus },
         { new: true }
       ).select("-password").lean();
-  
-      // Check if the vendor was found and updated
       if (!updatedVendor) {
         return res.status(404).json({ message: "Vendor not found" });
       }
-  
-      // Send the updated vendor data as response
       res.status(200).json(updatedVendor);
     } catch (err) {
       next(err);
     }
   };
   
-
   const getAllVendor = async (req, res, next) => {
     try {
-      // Retrieve all vendors from the database
       const vendors = await vendorModel.find().select("-password").lean();
-  
-      // Check if any vendors were found
       if (vendors.length === 0) {
         return res.status(404).json({ message: "No vendors found" });
       }
-  
-      // Send the list of vendors as response
+
       res.status(200).json(vendors);
     } catch (err) {
       next(err);
     }
   };
-  
-  
 
- 
 
+  const refreshToken = async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      console.log(refreshToken);
+  
+      const existingToken = await vendorToken.findOne({
+        refreshToken: { $eq: refreshToken },
+      });
+      if (!existingToken) {
+        return res.status(401).json({
+          message: "Invalid refresh token",
+        });
+      }
+      const existingUser = await VendorModel.findById(existingToken.vendor);
+      if (!existingUser) {
+        return res.status(401).json({
+          message: "Invalid refresh token",
+        });
+      }
+  
+      const refreshTokenExpiresAt =
+        jwt.decode(existingToken.refreshToken).exp * 1000;
+      if (Date.now() >= refreshTokenExpiresAt) {
+        await existingToken.deleteOne();
+        return res.status(401).json({
+          message: "Expired refresh token",
+        });
+      }
+  
+      const payload = {
+        id: existingUser._id,
+        email: existingUser.email,
+      };
+  
+      const accessToken = jwt.sign(payload, process.env.SECRET, {
+        expiresIn: "2m",
+      });
+  
+      res.status(200).json({
+        accessToken,
+        refreshToken: existingToken.refreshToken,
+        accessTokenUpdatedAt: new Date().toLocaleString(),
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  };
+  
   module.exports = {
     addVendor,
     signin,
@@ -280,5 +303,6 @@ const LOG_TYPE = {
     logout,
     updateVendor,
     updateVendorStatus,
-    getAllVendor
+    getAllVendor,
+    refreshToken
   };

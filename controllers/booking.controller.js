@@ -1,6 +1,8 @@
 const {viewBookingList} = require("../handlers/bookingHandler/viewBookingList");
 const {createBooking} = require('../handlers/bookingHandler/createBooking');
-const {updateBooking} = require('../handlers/bookingHandler/updateBooking')
+// const {incomingBookingStatus} = require('../handlers/bookingHandler/incomingBookingStatus')
+const {incomingBookingStatus} = require('../handlers/bookingHandler/incomingBookingStatus')
+ 
 
 exports.view_booking_list = async (req, res) => {
   try {
@@ -18,9 +20,10 @@ exports.create_new_booking = async (req, res) => {
     }
   };
 
-exports.update_booking = async (req, res) => {
+exports.Incoming_booking_status= async (req, res) => {
     try {
-      await updateBooking(req, res);
+      console.log("testing------34");
+      await incomingBookingStatus(req, res);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }

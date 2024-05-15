@@ -1,12 +1,18 @@
 const Booking = require('../../models/booking.model');
 
-const updateBooking = async (req, res) => {
+const incomingBookingStatus = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updateData = req.body;
+    console.log("testing.....1");
+    const { user } = req.userId;
+
+    // Set status as "Incoming" and actualInTime as Date.now()
+    const updateData = {
+      status: "Incoming",
+      actualInTime: Date.now()
+    };
 
     // Find the booking by ID and update it with the provided data
-    const updatedBooking = await Booking.findByIdAndUpdate(id, updateData, { new: true });
+    const updatedBooking = await Booking.findByIdAndUpdate(user, updateData, { new: true });
 
     if (!updatedBooking) {
       return res.status(404).json({ message: 'Booking not found' });
@@ -19,4 +25,4 @@ const updateBooking = async (req, res) => {
   }
 };
 
-module.exports = updateBooking;
+module.exports = incomingBookingStatus;
