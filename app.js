@@ -1,11 +1,4 @@
-/**
- * Project Name: Parkar
- * Description: A social networking platform with automated content moderation and context-based authentication system.
- *
- * Author: Neaz Mahmud
- * Email: neaz6160@gmail.com
- * Date: 19th June 2023
- */
+
 
 require("dotenv").config();
 const express = require("express");
@@ -73,6 +66,74 @@ app.use("/booking", bookingRoutes)
 app.use("/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
 app.use("/guard", guardRoutes)
+
+
+
+const shortid = require('shortid')
+const Razorpay = require('razorpay')
+
+
+
+const razorpay = new Razorpay({
+
+	key_id: 'rzp_test_muLBb6gKqfrZA5',
+	key_secret: 'Pr8ALVkn1EA6H7iDMqJY8yVL'
+})
+
+app.get('/logo.svg', (req, res) => {
+	res.sendFile(path.join(__dirname, 'logo.svg'))
+})
+
+app.post('/verification', (req, res) => {
+	// do a validation
+	const secret = 'Pr8ALVkn1EA6H7iDMqJY8yVL'
+
+	console.log(req.body)
+
+	const crypto = require('crypto')
+  let body = req.body.response.razorpay_order_id + "|" + req.body.response.razorpay_payment_id;
+
+	const shasum = crypto.createHmac('sha256', secret)
+	shasum.update(body.toString())
+	const digest = shasum.digest('hex')
+
+	console.log(digest, req.body.response.razorpay_signature)
+
+	if (digest === req.body.response.razorpay_signature) {
+		console.log('request is legit')
+		// process it
+	} else {
+		// pass it
+	}
+	res.json({ status: 'ok' })
+})
+
+app.post('/razorpay', async (req, res) => {
+  console.log(req.body)
+	const payment_capture = 1
+	const amount = req.body.body
+	const currency = 'INR'
+
+	const options = {
+		amount: amount * 100,
+		currency,
+		receipt: shortid.generate(),
+		payment_capture
+	}
+
+	try {
+		const response = await razorpay.orders.create(options)
+		console.log(response)
+		res.json({
+			id: response.id,
+			currency: response.currency,
+			amount: response.amount
+		})
+	} catch (error) {
+		console.log(error)
+	}
+})
+
 
 
 

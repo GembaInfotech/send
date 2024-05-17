@@ -10,7 +10,8 @@ exports.createBooking = async (req, res) => {
       parking,
       parkingName,
       inTime,
-      outTime
+      outTime,
+      price
      
     
     
@@ -22,7 +23,8 @@ exports.createBooking = async (req, res) => {
       parking,
     parkingName,
       inTime,
-      outTime
+      outTime,
+      price
     
    
     });
