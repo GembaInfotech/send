@@ -102,7 +102,6 @@ VendorSchema.methods.generateRefreshToken = async function(){
     await this.save();
     return reftoken;
   } catch(err){
-    console.log("Error")
   }
 }
 VendorSchema.methods.generateAuthToken = async function(){
@@ -117,7 +116,6 @@ VendorSchema.methods.generateAuthToken = async function(){
     );
     return token;
   } catch(err){
-    console.log("Error")
   }
 }
 module.exports = mongoose.model('VendorModel', VendorSchema);

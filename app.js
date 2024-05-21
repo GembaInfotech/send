@@ -88,7 +88,6 @@ app.post('/verification', (req, res) => {
 	// do a validation
 	const secret = 'Pr8ALVkn1EA6H7iDMqJY8yVL'
 
-	console.log(req.body)
 
 	const crypto = require('crypto')
   let body = req.body.response.razorpay_order_id + "|" + req.body.response.razorpay_payment_id;
@@ -97,10 +96,8 @@ app.post('/verification', (req, res) => {
 	shasum.update(body.toString())
 	const digest = shasum.digest('hex')
 
-	console.log(digest, req.body.response.razorpay_signature)
 
 	if (digest === req.body.response.razorpay_signature) {
-		console.log('request is legit')
 		// process it
 	} else {
 		// pass it
@@ -109,7 +106,6 @@ app.post('/verification', (req, res) => {
 })
 
 app.post('/razorpay', async (req, res) => {
-  console.log(req.body)
 	const payment_capture = 1
 	const amount = req.body.body
 	const currency = 'INR'
@@ -123,7 +119,6 @@ app.post('/razorpay', async (req, res) => {
 
 	try {
 		const response = await razorpay.orders.create(options)
-		console.log(response)
 		res.json({
 			id: response.id,
 			currency: response.currency,

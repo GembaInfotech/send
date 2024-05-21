@@ -44,7 +44,6 @@ const getCategoriesFromTextRazor = async (content, timeout) => {
     return categories;
   } catch (error) {
     if (axios.isCancel(error)) {
-      console.log("TextRazor request cancelled");
       return categories;
     } else {
       const { status, statusText } = error.response;

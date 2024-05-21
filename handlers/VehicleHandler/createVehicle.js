@@ -3,7 +3,6 @@ const UserModel = require('../../models/user.model');
 exports.createVehicle = async (req, res) => {
      const {vehicle} =req.body;
     const userId = req.userId;
-    console.log(userId)
     const { vehicle_name, vehicle_number, vehicle_type } = vehicle;
   
     try {

@@ -15,7 +15,6 @@ exports.create_new_vehicle = async(req, res)=>{
 
 exports.view_vehicle_list = async(req, res)=>{
     try {
-        console.log("hello");
         await viewVehicleList(req, res);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });

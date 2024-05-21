@@ -31,6 +31,8 @@ const bookingSchema = new mongoose.Schema({
   exceedTotalPrice:Number,
   totalPrice: Number,
   bookingPrice:Number,
+  vehicle_name:String,
+      vehicle_number:String,
   paymentId:String,
   status: {
     type: String,

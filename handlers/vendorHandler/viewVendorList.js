@@ -8,7 +8,6 @@ exports.viewVendorList = async (req, res) => {
       return res.status(404).json({ message: 'No vendors found' });
     }
 
-    console.log('Vendors retrieved successfully');
     return res.status(200).json({ vendors });
   } catch (err) {
     console.error('Error fetching vendors:', err);

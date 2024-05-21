@@ -32,8 +32,7 @@ const LOG_TYPE = {
   };
   
   const signin = async (req, res, next) => {
-    console.log("hello");
-    console.log(req.body);
+   
     await saveLogInfo(
       req,
       MESSAGE.SIGN_IN_ATTEMPT,
@@ -43,11 +42,9 @@ const LOG_TYPE = {
   
     try {
       const { email, password } = req.body;
-      console.log(req.body);
       const existingVendor = await vendorModel.findOne({
         email: { $eq: email },
       });
-      console.log(existingVendor);
       if (!existingVendor) {
         await saveLogInfo(
           req,
@@ -65,7 +62,6 @@ const LOG_TYPE = {
         existingVendor.password
       );
 
-      console.log(isPasswordCorrect);
   
       if (!isPasswordCorrect) {
         await saveLogInfo(
@@ -84,7 +80,6 @@ const LOG_TYPE = {
         email: existingVendor.email,
       };
 
-      console.log("testing...1");
   
       const accessToken = jwt.sign(payload, process.env.SECRET, {
         expiresIn: "10m",
@@ -140,7 +135,6 @@ const LOG_TYPE = {
   const logout = async (req, res) => {
     try {
       const refreshToken = req.headers.authorization?.split(" ")[1] ?? null;
-      console.log(req.headers.authorization)
       if (refreshToken) {
         await vendorToken.deleteOne({ refreshToken });
         await saveLogInfo(
@@ -163,7 +157,6 @@ const LOG_TYPE = {
 
   const getVendor = async (req, res, next) => {
     try {
-      console.log("hello");
       const id = req.userId
       const vendor = await vendorModel.findById(id).select("-password").lean();
       res.status(200).json(vendor);
@@ -249,7 +242,6 @@ const LOG_TYPE = {
   const refreshToken = async (req, res) => {
     try {
       const { refreshToken } = req.body;
-      console.log(refreshToken);
   
       const existingToken = await vendorToken.findOne({
         refreshToken: { $eq: refreshToken },

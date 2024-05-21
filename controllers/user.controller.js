@@ -44,11 +44,11 @@ const signin = async (req, res, next) => {
   );
 
   try {
-    const { email, password } = req.body;
+    const  { email, password } = req.body;
+    
     const existingUser = await User.findOne({
-      email: { $eq: email },
+      email: { $regex: new RegExp(email, 'i') },
     });
-    console.log("c1")
     if (!existingUser) {
       await saveLogInfo(
         req,
@@ -56,7 +56,6 @@ const signin = async (req, res, next) => {
         LOG_TYPE.SIGN_IN,
         LEVEL.ERROR
       );
-      console.log("c2")
 
       return res.status(404).json({
         message: "Invalid credentials",
@@ -75,7 +74,6 @@ const signin = async (req, res, next) => {
         LOG_TYPE.SIGN_IN,
         LEVEL.ERROR
       );
-      console.log("c3")
 
       return res.status(400).json({
         message: "Invalid credentials",
@@ -87,7 +85,6 @@ const signin = async (req, res, next) => {
       enableContextBasedAuth: true,
     });
 
-    console.log("c4")
 
     if (isContextAuthEnabled) {
       const contextDataResult = await verifyContextData(req, existingUser);
@@ -99,7 +96,6 @@ const signin = async (req, res, next) => {
           LOG_TYPE.SIGN_IN,
           LEVEL.WARN
         );
-        console.log("c5")
 
         return res.status(401).json({
           message:
@@ -130,7 +126,6 @@ const signin = async (req, res, next) => {
           LOG_TYPE.SIGN_IN,
           LEVEL.WARN
         );
-        console.log("c6")
         return res.status(401).json({
           message: `You've temporarily been blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
           Please follow the instructions in the email to verify your identity and gain access to your account.
@@ -167,19 +162,13 @@ const signin = async (req, res, next) => {
     }
 
     try{ 
-      console.log("h1")
-      console.log(existingUser._id.toString())
       const existingToken = await Token.findOne({
         user: { $eq: existingUser._id.toString() },
       });
-      console.log("here")
-      console.log(existingToken)
       if (existingToken?.user) {
         await Token.deleteOne({ _id:existingToken._id });
-        console.log("deleted")
             
       }
-      console.log("deleted token ")
 
     }catch(err)
     {
@@ -190,12 +179,10 @@ const signin = async (req, res, next) => {
     }
 
 
-    console.log("c7")
     const payload = {
       id: existingUser._id,
       email: existingUser.email,
     };
-    console.log("c9")
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: "2h",
@@ -204,7 +191,6 @@ const signin = async (req, res, next) => {
     const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET, {
       expiresIn: "7d",
     });
-  console.log("c7")
     const newRefreshToken = new Token({
       user: existingUser._id,
       refreshToken,
@@ -213,7 +199,6 @@ const signin = async (req, res, next) => {
     await newRefreshToken.save();
 
     
-    console.log("c8")
     res.status(200).json({
       accessToken,
       refreshToken,
@@ -226,7 +211,6 @@ const signin = async (req, res, next) => {
         avatar: existingUser.avatar,
       },
     });
-    console.log("c9")
   } catch (err) {
     await saveLogInfo(
       req,
@@ -329,7 +313,6 @@ const getUser = async (req, res, next) => {
 
 const addUser = async (req, res, next) => {
   let newUser;
-  console.log(req.body);
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   /**
    * @type {boolean} isConsentGiven
@@ -338,7 +321,6 @@ const addUser = async (req, res, next) => {
    */
 
   const isConsentGiven = JSON.parse(req.body.isConsentGiven);
- console.log("c1")
   const defaultAvatar =
     "https://raw.githubusercontent.com/nz-m/public-files/main/dp.jpg";
   const fileUrl = req.files?.[0]?.filename
@@ -347,7 +329,6 @@ const addUser = async (req, res, next) => {
       }`
     : defaultAvatar;
 
-    console.log("c2")
 
   const emailDomain = req.body.email.split("@")[1];
   const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
@@ -359,13 +340,10 @@ const addUser = async (req, res, next) => {
     role: role,
     avatar: fileUrl,
   });
-  console.log("c3")
 
   try {
-    console.log(newUser)
     await newUser.save();
-    console.log(newUser)
-    console.log("c7")
+  
     if (newUser.isNew) {
       throw new Error("Failed to add user");
     }
@@ -378,10 +356,9 @@ const addUser = async (req, res, next) => {
       next();
 
     }
-    console.log("c4")
+    
 
   } catch (err) {
-    console.log(err)
     res.status(400).json({
       message: "Failed to add user",
     });

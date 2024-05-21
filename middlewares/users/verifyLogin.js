@@ -65,9 +65,7 @@ const sendLoginVerificationEmail = async (req, res) => {
       message: `Access blocked due to suspicious activity. Verification email was sent to your email address.`,
     });
   } catch (err) {
-    console.log(
-      "Could not send email. There could be an issue with the provided credentials or the email service."
-    );
+   
     res.status(500).json({ message: "Something went wrong" });
   }
 };

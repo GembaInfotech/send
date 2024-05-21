@@ -2,7 +2,6 @@ const Booking = require('../../models/booking.model');
 
 const incomingBookingStatus = async (req, res) => {
   try {
-    console.log("testing.....1");
     const { user } = req.userId;
 
     // Set status as "Incoming" and actualInTime as Date.now()

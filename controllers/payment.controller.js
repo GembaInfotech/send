@@ -10,11 +10,8 @@ exports.sayHello = async (req, res) => {
   }
 };
 exports.createPaymentLink = async (req, res) => {
-    console.log(req.params.id)
  
-   console.log("created")
  try {
-   console.log("dsfffffffffffffffffffffffffffff")
      
      const order = await Booking.findById(req.params.id);
      const paymentLinkRequest = {
@@ -32,7 +29,6 @@ exports.createPaymentLink = async (req, res) => {
      const paymentLinkId = paymentLink.id;
      const payment_link_url = paymentLink.short_url;
  
-     console.log("orders")
 
      const resData = {
        paymentLinkId: paymentLinkId,
@@ -75,7 +71,6 @@ exports.order  = async (req, res) => {
 
 exports.validate = async(req, res)=>{
     const {razorpay_order_id, razorpay_payment_id, razorpay_signature} =req.body;
-    console.log(req.body);
 
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -85,12 +80,11 @@ exports.validate = async(req, res)=>{
     const digest = data.digest('hex')
    try{
     if(digest!==razorpay_signature){
-        console.log(digest)
         return res.status(400).json({msg: "Transaction not legit!"});
     }
    }
    catch(err)
-   {console.log(err)
+   {
     return res.json({msg:msg})
    }
    data.update(JSON.stringify(req.body))
@@ -98,7 +92,6 @@ exports.validate = async(req, res)=>{
 
 if (digest === req.headers['x-razorpay-signature']) {
 
-       console.log('request is legit')
 
        //We can send the response and store information in a database.
 

@@ -22,7 +22,6 @@ exports.create_new_booking = async (req, res) => {
 
   exports.confirm_booking = async (req, res) => {
     try {
-      console.log(req.params)
       await confirmBooking(req, res);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
@@ -31,7 +30,6 @@ exports.create_new_booking = async (req, res) => {
 
 exports.Incoming_booking_status= async (req, res) => {
     try {
-      console.log("testing------34");
       await incomingBookingStatus(req, res);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });

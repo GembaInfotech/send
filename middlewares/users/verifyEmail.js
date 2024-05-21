@@ -24,12 +24,10 @@ const sendVerificationEmail = async (req, res) => {
   const USER = process.env.EMAIL;
   const PASS = process.env.PASSWORD;
   const { email, name } = req.body;
-  console.log("Start")
-console.log(req.body)
+  
   const verificationCode = Math.floor(10000 + Math.random() * 90000);
   const verificationLink = `http://localhost:3000/auth/verify?code=${verificationCode}&email=${email}`;
-    console.log("mid")
-    console.log(verificationLink)
+    
   try {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
@@ -38,7 +36,6 @@ console.log(req.body)
         pass: "fdizpvbebqkdkgku",
       },
     });
-   console.log("smid")
    try{
 
     const mailOptions = {
@@ -62,23 +59,19 @@ console.log(req.body)
    {
     console.log(er)
    }
-   console.log("last")
     const newVerification = new EmailVerification({
       email,
       verificationCode,
       messageId: info.messageId,
       for: "signup",
     });
-    console.log("0")
     await newVerification.save();
 
     res.status(200).json({
       message: `Verification email was successfully sent to ${email}`,
     });
   } catch (err) {
-    console.log(
-      "Could not send verification email. There could be an issue with the provided credentials or the email service."
-    );
+    
     res.status(500).json({ message: "Something went wrong" });
   }
 };

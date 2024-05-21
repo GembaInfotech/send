@@ -9,7 +9,6 @@ exports.confirmBooking = async (req, res) => {
       status: "Confirmed"
 
     };
-    console.log("ll",req.params)
     const {id}  = req.params;
 
 

@@ -36,7 +36,6 @@ exports.createVendor = async (req, res) => {
     });
 
     await vendor.save();
-    console.log('Vendor created successfully');
     return res.status(201).json({ message: 'Vendor created successfully', vendor });
   } catch (err) {
     console.error('Error creating vendor:', err);

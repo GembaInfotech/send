@@ -3,20 +3,24 @@ const Booking = require('../../models/booking.model');
 exports.createBooking = async (req, res) => {
   try {
     const user = req.userId;
-    console.log(req.body)
-    console.log(user);
+   
     const {
       
       parking,
       parkingName,
       inTime,
       outTime,
-      price
+      price,
+      totalPrice,
+      sgst,
+      cgst,
+      vehicle_name,
+      vehicle_number
      
     
     
     } = req.body.bookingData;
-    console.log(outTime)
+
 
     const newBooking = new Booking({
       user,
@@ -24,7 +28,12 @@ exports.createBooking = async (req, res) => {
     parkingName,
       inTime,
       outTime,
-      price
+      price,
+      totalPrice,
+      sgst,
+      cgst,
+      vehicle_name,
+      vehicle_number
     
    
     });
