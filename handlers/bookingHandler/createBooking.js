@@ -1,5 +1,5 @@
 const Booking = require('../../models/booking.model');
-
+const format = require('date-fns')
 exports.createBooking = async (req, res) => {
   try {
     const user = req.userId;
@@ -26,7 +26,7 @@ exports.createBooking = async (req, res) => {
       user,
       parking,
     parkingName,
-      inTime,
+      inTime ,
       outTime,
       price,
       totalPrice,
