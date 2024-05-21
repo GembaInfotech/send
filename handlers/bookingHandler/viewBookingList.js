@@ -3,8 +3,10 @@ const Booking = require('../../models/booking.model')
 
 exports.viewBookingList = async (req, res) => {
   try {
-    const user = req.userID
-    const bookings = await Booking.find();
+    const user = req.userId
+    console.log(req.userId)
+
+    const bookings = await Booking.find({user});
     res.status(200).json({
       success: true,
       data: bookings
