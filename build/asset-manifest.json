@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.3f52a374.css",
-    "main.js": "/static/js/main.efaafd60.js",
+    "main.css": "/static/css/main.2eeb0719.css",
+    "main.js": "/static/js/main.dc194fb1.js",
     "static/js/65.6faa64f4.chunk.js": "/static/js/65.6faa64f4.chunk.js",
     "static/js/266.e5ca6f32.chunk.js": "/static/js/266.e5ca6f32.chunk.js",
     "static/js/399.67f991ab.chunk.js": "/static/js/399.67f991ab.chunk.js",
@@ -14,17 +14,18 @@
     "static/js/531.1dd34930.chunk.js": "/static/js/531.1dd34930.chunk.js",
     "static/js/805.07ef009d.chunk.js": "/static/js/805.07ef009d.chunk.js",
     "static/js/699.af346b45.chunk.js": "/static/js/699.af346b45.chunk.js",
+    "static/media/bookingcard.jpg": "/static/media/bookingcard.0c4106f28805413a6478.jpg",
+    "static/media/homepage.jpg": "/static/media/homepage.ee76773f0cb7dc746543.jpg",
     "static/media/parking3.jpg": "/static/media/parking3.a40cc83810e36ecf54dc.jpg",
     "static/media/nofollow.jpg": "/static/media/nofollow.58f81d5df42195759a8f.jpg",
     "static/media/nopost.jpg": "/static/media/nopost.9a906e1cf16c6c7fa3bb.jpg",
     "static/media/about.jpg": "/static/media/about.26696385948394ed9304.jpg",
-    "static/media/home.jpg": "/static/media/home.a4b3766fc6f911f2af86.jpg",
     "static/media/contact.jpg": "/static/media/contact.092d8a6066a27d51841b.jpg",
     "static/media/road.avif": "/static/media/road.066a66e0464d4771077a.avif",
     "static/media/model.avif": "/static/media/model.5d86922d0ad1d6f9bb92.avif",
     "index.html": "/index.html",
-    "main.3f52a374.css.map": "/static/css/main.3f52a374.css.map",
-    "main.efaafd60.js.map": "/static/js/main.efaafd60.js.map",
+    "main.2eeb0719.css.map": "/static/css/main.2eeb0719.css.map",
+    "main.dc194fb1.js.map": "/static/js/main.dc194fb1.js.map",
     "65.6faa64f4.chunk.js.map": "/static/js/65.6faa64f4.chunk.js.map",
     "266.e5ca6f32.chunk.js.map": "/static/js/266.e5ca6f32.chunk.js.map",
     "399.67f991ab.chunk.js.map": "/static/js/399.67f991ab.chunk.js.map",
@@ -39,7 +40,7 @@
     "699.af346b45.chunk.js.map": "/static/js/699.af346b45.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3f52a374.css",
-    "static/js/main.efaafd60.js"
+    "static/css/main.2eeb0719.css",
+    "static/js/main.dc194fb1.js"
   ]
 }
