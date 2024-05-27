@@ -33,11 +33,13 @@ const bookingSchema = new mongoose.Schema({
   bookingPrice:Number,
   vehicle_name:String,
       vehicle_number:String,
+      transaction_id :String,
+      order_id :String,
   paymentId:String,
   status: {
     type: String,
     enum: ["Pending","Incoming", "Parked", "Completed", "Confirmed"],
-    default: "Pending",
+    default: "Confirmed",
   },
 });
 

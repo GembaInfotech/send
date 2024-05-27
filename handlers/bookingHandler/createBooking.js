@@ -3,6 +3,7 @@ const format = require('date-fns')
 exports.createBooking = async (req, res) => {
   try {
     const user = req.userId;
+    console.log(req.body.bookingData)
    
     const {
       
@@ -15,7 +16,9 @@ exports.createBooking = async (req, res) => {
       sgst,
       cgst,
       vehicle_name,
-      vehicle_number
+      vehicle_number,
+      transaction_id,
+      order_id
      
     
     
@@ -33,7 +36,9 @@ exports.createBooking = async (req, res) => {
       sgst,
       cgst,
       vehicle_name,
-      vehicle_number
+      vehicle_number,
+      transaction_id,
+      order_id
     
    
     });
