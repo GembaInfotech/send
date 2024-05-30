@@ -15,7 +15,7 @@ router.route('/create-new-vehicle').post( decodeToken,  vehicleController.create
 
   router.route('/view-vehicle-list').get(decodeToken, vehicleController.view_vehicle_list);
 
-  router.route('delete-vehicle/:vehicleId').delete( vehicleController.delete_vehicle);
+  router.route('/delete-vehicle/:vehicleId').delete(decodeToken, vehicleController.delete_vehicle);
 
 
 

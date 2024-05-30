@@ -1,8 +1,10 @@
-const User = require('../../models/user.model');
+const UserModel = require('../../models/user.model');
 
 exports.deleteVehicle = async (req, res) => {
     const userId = req.userId;
+    console.log(userId)
     const vehicleId = req.params.vehicleId; 
+    console.log(vehicleId)
   
     try {
       const user = await UserModel.findOne({_id:userId});
