@@ -17,6 +17,8 @@ const bookingRoutes = require("./routes/booking.route.js")
 const vendorRoute = require('./routes/vendor.route.js')
 const paymentRoute = require('./routes/paymentRoute.js')
 const guardRoutes = require('./routes/guard.route.js')
+const addressDetailRoute = require('./routes/AddressDetailRoute.js')
+
 
 const app = express();
 
@@ -66,6 +68,8 @@ app.use("/booking", bookingRoutes)
 app.use("/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
 app.use("/guard", guardRoutes)
+app.use("/add", addressDetailRoute)
+
 
 
 
