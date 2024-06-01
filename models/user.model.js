@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const userSchema = new Schema(
   {
+    code:{
+      type:String
+    },
    
     contact: {
       type: Number,

@@ -10,6 +10,7 @@ const { verifyContextData, types } = require("./auth.controller");
 const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
+const { generateUserCode } = require("../handlers/codeHandler/Code");
 dayjs.extend(duration);
 
 const LOG_TYPE = {
@@ -45,7 +46,7 @@ const signin = async (req, res, next) => {
 
   try {
     const  { email, password } = req.body;
-    
+    console.log(req.body)
     const existingUser = await User.findOne({
       email: { $regex: new RegExp(email, 'i') },
     });
@@ -181,6 +182,7 @@ const signin = async (req, res, next) => {
 
     const payload = {
       id: existingUser._id,
+      code:existingUser?.code,
       email: existingUser.email,
     };
 
@@ -342,6 +344,9 @@ const addUser = async (req, res, next) => {
   });
 
   try {
+    await newUser.save();
+    const code = await generateUserCode();
+    newUser.code = code;
     await newUser.save();
   
     if (newUser.isNew) {

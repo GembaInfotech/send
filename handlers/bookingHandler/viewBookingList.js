@@ -3,7 +3,7 @@ const Booking = require('../../models/booking.model')
 
 exports.viewBookingList = async (req, res) => {
   try {
-    const user = req.userId
+    const user = req.code
     console.log(req.userId)
 
     const bookings = await Booking.find({user});

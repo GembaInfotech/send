@@ -1,8 +1,10 @@
 const Booking = require('../../models/booking.model');
-const format = require('date-fns')
+const format = require('date-fns');
+const { generateBookingCode } = require('../codeHandler/Code');
 exports.createBooking = async (req, res) => {
   try {
-    const user = req.userId;
+    const user = req?.code;
+    console.log(user)
     console.log(req.body.bookingData)
    
     const {
@@ -18,7 +20,8 @@ exports.createBooking = async (req, res) => {
       vehicle_name,
       vehicle_number,
       transaction_id,
-      order_id
+      order_id,
+      parkingCode
      
     
     
@@ -29,6 +32,7 @@ exports.createBooking = async (req, res) => {
       user,
       parking,
     parkingName,
+    parkingCode,
       inTime ,
       outTime,
       price,
@@ -44,10 +48,20 @@ exports.createBooking = async (req, res) => {
     });
 
     // Save the booking
-    const savedBooking = await newBooking.save();
+    try{
+      const savedBooking = await newBooking.save();
+      const code = await generateBookingCode();
+      savedBooking.code = code;
+      await savedBooking.save();
+      console.log(savedBooking)
+    }
+    catch (err)
+    {
+       console.log(err)
+    }
 
     // Send response
-    res.status(201).json({ booking: savedBooking });
+    res.status(201).json({"message":true});
   } catch (error) {
     console.error("Error creating booking:", error);
     res.status(500).json({ error: "Internal Server Error" });

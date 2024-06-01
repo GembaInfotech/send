@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const bookingSchema = new mongoose.Schema({
+  code:{
+    type:String
+  },
   user: {
     type: String
   },
@@ -16,6 +19,8 @@ const bookingSchema = new mongoose.Schema({
     type: String,
   },
   actualInTime:String,
+  
+  parkingCode:String,
   actualOutTime:String,
   duration:Number,
   actualDuration:Number,
