@@ -12,6 +12,7 @@ exports.forget_password = async (req, res) => {
 
 exports.reset_password_redirect = async (req, res) => {
   try {
+    console.log("resetpassword....1")
     await resetPasswordRedirect(req, res);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });

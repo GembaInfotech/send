@@ -4,6 +4,7 @@ const response = require("../../middlewares/utils/responseHandle");
 
 exports.resetPasswordRedirect = async (req, res) => {
     try {
+        console.log("resetpassword...2")
         let forgotToken = req.params.token; 
         console.log(forgotToken);
 

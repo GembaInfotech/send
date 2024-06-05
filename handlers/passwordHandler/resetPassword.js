@@ -1,7 +1,5 @@
 const ForgetPassword = require("../../models/forgetPassword.model");
 const User = require('../../models/user.model');
-// const nodemailer = require("../../middlewares/utils/nodemailer");
-// const crypto = require("crypto");
 const log = require('../../middlewares/utils/log');
 const response = require('../../middlewares/utils/responseHandle')
 const bcrypt = require('bcrypt');
@@ -15,7 +13,7 @@ function validatePW(str) {
 
 exports.resetPassword = async (req, res) => {
     console.log("hello");
-    let forgotToken = req.body.token; // corrected to match typical request body parameter
+    let forgotToken = req.body.token; 
     let password = req.body.password;
     let confirmPassword = req.body.confirmPassword;
 
@@ -40,9 +38,6 @@ exports.resetPassword = async (req, res) => {
 
         const saltRounds = 10;
         const hash = bcrypt.hashSync(password, saltRounds);
-        
-
-
         await User.updateOne({ email: data.email }, { password: hash });
         await ForgetPassword.updateOne({ token: forgotToken }, { verified: "1" });
 
