@@ -4,7 +4,6 @@ const nodemailer = require("../../middlewares/utils/nodemailer")
 const crypto = require("crypto")
 const log = require('../../middlewares/utils/log')
 const response = require("../../middlewares/utils/responseHandle")
-// const transporterForResetPass = require('../../middlewares/utils/nodemailer')
 exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
 
@@ -16,16 +15,10 @@ exports.forgotPassword = async (req, res) => {
         if (!user) {
         return res.status(404).json({ error: 'User not found' });
     }
-// console.log(user);
-
-        // Generate a reset token
         const forgetToken = crypto.randomBytes(20).toString('hex');
         await forgetPassword.create({ userId: user._id, email: email, token: forgetToken, verified: '0' });
-        // console.log("ndcnfkcnkn");
-        // Create a URL for password reset
         const resetUrl = "http://localhost:3000" + "/reset-password/" + forgetToken + "/";
 
-        // Send the password reset email
         const Data = {
             email: email,
             link: resetUrl
