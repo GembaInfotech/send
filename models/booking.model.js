@@ -1,3 +1,4 @@
+const { Timestamp } = require("mongodb");
 const mongoose = require("mongoose");
 const bookingSchema = new mongoose.Schema({
   code:{
@@ -46,6 +47,8 @@ const bookingSchema = new mongoose.Schema({
     enum: ["Pending","Incoming", "Parked", "Completed", "Confirmed"],
     default: "Confirmed",
   },
-});
+
+},
+{timestamps:true});
 
 module.exports = mongoose.model("Booking", bookingSchema);
