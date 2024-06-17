@@ -5,6 +5,10 @@ exports.viewParkingList = async (req, res) => {
   try {
     const {latitude} = req.query
     const {longitude} =req.query
+    const {outTime} = req.query
+    const outDate = outTime.split("T")[0]
+    console.log(outDate);
+    console.log(outTime);
     const parkings = await ParkingModel.find({
         location: {
            $near: {
@@ -14,8 +18,11 @@ exports.viewParkingList = async (req, res) => {
               },
               $maxDistance : 8000
            }
-        }
+        },
+        validity_ToDate: { $gte: outDate }
+
      });
+
     res.status(200).json({
       success: true,
       data: parkings
