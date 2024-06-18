@@ -19,7 +19,8 @@ exports.viewParkingList = async (req, res) => {
               $maxDistance : 8000
            }
         },
-        validity_ToDate: { $gte: outDate }
+        validity_ToDate: { $gte: outDate },
+        status: 'active'
 
      });
 
