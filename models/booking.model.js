@@ -15,6 +15,7 @@ const bookingSchema = new mongoose.Schema({
   inTime: {
     type: String,
   },
+
   outTime: {
     type: String,
   },
@@ -38,6 +39,7 @@ const bookingSchema = new mongoose.Schema({
   bookingPrice:Number,
   vehicle_name:String,
       vehicle_number:String,
+      vehicle_type:String,
       transaction_id :String,
       order_id :String,
   paymentId:String,
