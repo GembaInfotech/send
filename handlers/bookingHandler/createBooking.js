@@ -19,6 +19,7 @@ exports.createBooking = async (req, res) => {
       cgst,
       vehicle_name,
       vehicle_number,
+      vehicle_type,
       transaction_id,
       order_id,
       parkingCode
@@ -41,6 +42,7 @@ exports.createBooking = async (req, res) => {
       cgst,
       vehicle_name,
       vehicle_number,
+      vehicle_type,
       transaction_id,
       order_id
     
