@@ -3,6 +3,7 @@ const ParkingModel = require("../../models/parking.model")
 exports.createParking = async (req, res) => {
     try {
       let parkingData = req.body;
+      console.log(req.body)
       parkingData["vendor_id"] = req.userId;
       // parkingData.vendorId = req.userId;
 

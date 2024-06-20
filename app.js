@@ -18,6 +18,7 @@ const vendorRoute = require('./routes/vendor.route.js')
 const paymentRoute = require('./routes/paymentRoute.js')
 const guardRoutes = require('./routes/guard.route.js')
 const addressDetailRoute = require('./routes/AddressDetailRoute.js')
+const resetPasswordRoute = require("./routes/forgetPasswordRoute.js")
 
 
 const app = express();
@@ -59,6 +60,8 @@ app.get("/search", decodeToken, search);
 
 app.use("/auth", contextAuthRoutes);
 app.use("/users", userRoutes);
+app.use("/resetpassword", resetPasswordRoute);
+
 app.use("/posts", postRoutes);
 app.use("/communities", communityRoutes);
 app.use("/admin", adminRoutes);
