@@ -8,6 +8,7 @@ const router = require("express").Router();
   router.route('/create-new-booking').post(decodeToken,bookingController.create_new_booking);
   router.route('/incoming-booking-status').put(decodeToken, bookingController.Incoming_booking_status);
   router.route('/confirm-booking/:id').put(decodeToken, bookingController.confirm_booking);
+  router.route('/cancel-booking/:bookingId').put(bookingController.booking_status);
 
   // router.route('/create-new-booking').post(decodeToken,bookingController.create_new_booking);
 

@@ -20,6 +20,7 @@ const bookingSchema = new mongoose.Schema({
   outTime: {
     type: String,
   },
+  cancelledAt:String,
   actualInTime:String,
   
   parkingCode:String,
@@ -46,7 +47,7 @@ const bookingSchema = new mongoose.Schema({
   paymentId:String,
   status: {
     type: String,
-    enum: ["Pending","Incoming", "Parked", "Completed", "Confirmed"],
+    enum: ["Pending","Incoming", "Parked", "Completed", "Confirmed", "Cancelled"],
     default: "Confirmed",
   },
 
