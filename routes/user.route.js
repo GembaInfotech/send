@@ -39,6 +39,7 @@ const {
 } = require("../middlewares/limiter/limiter");
 
 const decodeToken = require("../middlewares/auth/decodeToken");
+const { uploadPhoto } = require("../middlewares/ImageUpload/upload");
 const requireAuth = passport.authenticate("jwt", { session: false }, null);
 
 
@@ -52,7 +53,6 @@ router.get("/:id", requireAuth, getUser);
 router.post(
   "/signup",
   signUpSignInLimiter,
-  avatarUpload,
   addUserValidator,
   addUserValidatorHandler,
   addUser,

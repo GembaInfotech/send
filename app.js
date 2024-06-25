@@ -91,6 +91,104 @@ app.get('/logo.svg', (req, res) => {
 	res.sendFile(path.join(__dirname, 'logo.svg'))
 })
 
+app.post('/refund',  async (req,res)=>{
+
+ const paymentId = "pay_OOUz4tZyb5bggb"; // change it to dynamically provided payment id 
+ async function processRefund(paymentId) {
+	try {
+	  // Refund details
+	  const refundDetails = {
+		speed: 'normal',
+		notes: {
+		  notes_key_1: 'Your Refund is under processed.',
+		},
+		receipt: 'Receipt No. 765' // here generate a unique code such as combination of minute and date or anything else 
+	  };
+  
+	  // Create a refund
+	  const refund = await razorpay.payments.refund(paymentId, refundDetails);
+	  console.log('Refund successful:', refund);
+	  res.json(refund)
+	} catch (error) {
+	  console.error('Error processing refund:', error);
+	  res.json(error)
+	}
+  }
+  
+  // Example payment ID to be refunded
+  
+  // Call the function to process the refund
+  processRefund(paymentId);
+
+})
+app.get('/getrefund',  async (req,res)=>{
+
+	try {
+		// Fetch refunds with the given options
+		const refunds = await razorpay.refunds.all();
+		console.log('List of refunds:', refunds);
+		res.json(refunds)
+	  } catch (error) {
+		console.error('Error fetching refunds:', error);
+		res.json(error)
+	  }
+
+   
+   })
+
+   app.post('/payout', async (req,res)=>{
+	async function createPayout() {
+		try {
+		  const payout = await razorpay.payouts.create({
+			"account_number": "7878780080316316",
+			"amount": 1000000,
+			"currency": "INR",
+			"mode": "NEFT",
+			"purpose": "refund",
+			"fund_account": {
+				"account_type": "bank_account",
+				"bank_account": {
+					"name": "Gaurav Kumar",
+					"ifsc": "HDFC0001234",
+					"account_number": "1121431121541121"
+				},
+				"contact": {
+					"name": "Gaurav Kumar",
+					"email": "gaurav.kumar@example.com",
+					"contact": "9876543210",
+					"type": "vendor",
+					"reference_id": "Acme Contact ID 12345",
+					"notes": {
+						"notes_key_1": "Tea, Earl Grey, Hot",
+						"notes_key_2": "Tea, Earl Grey… decaf."
+					}
+				}
+			},
+			"queue_if_low_balance": true,
+			"reference_id": "Acme Transaction ID 12345",
+			"narration": "Acme Corp Fund Transfer",
+			"notes": {
+				"notes_key_1": "Beam me up Scotty",
+				"notes_key_2": "Engage"
+			}
+		  });
+		  console.log('Payout created:', payout);
+		} catch (error) {
+		  console.error('Error creating payout:', error);
+		}
+	  }
+
+	  try {
+		 const response = await createPayout();
+		 res.json(response);
+	  }
+	  catch(err)
+	  {
+		res.json(err);
+	  }
+   })
+
+
 app.post('/verification', (req, res) => {
 	// do a validation
 	const secret = 'Pr8ALVkn1EA6H7iDMqJY8yVL'

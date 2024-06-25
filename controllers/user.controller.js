@@ -11,6 +11,7 @@ const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const { generateUserCode } = require("../handlers/codeHandler/Code");
+const { uploadPhoto } = require("../middlewares/ImageUpload/upload");
 dayjs.extend(duration);
 
 const LOG_TYPE = {
@@ -334,6 +335,7 @@ const addUser = async (req, res, next) => {
 
   const emailDomain = req.body.email.split("@")[1];
   const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
+  const strings =  uploadPhoto();
 
   newUser = new User({
     name: req.body.name,
