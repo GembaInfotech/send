@@ -21,6 +21,7 @@ const bookingSchema = new mongoose.Schema({
     type: String,
   },
   cancelledAt:String,
+  refundId:String,
   actualInTime:String,
   
   parkingCode:String,

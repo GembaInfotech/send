@@ -5,12 +5,11 @@ const Razorpay = require('razorpay');
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
   key_id: 'rzp_test_muLBb6gKqfrZA5',
-	key_secret: 'Pr8ALVkn1EA6H7iDMqJY8yVL'
+  key_secret: 'Pr8ALVkn1EA6H7iDMqJY8yVL'
 });
 
 exports.bookingStatus = async (req, res) => {
   try {
-    console.log(req.body);
     const { bookingId } = req.params;
     const booking = await BookingModel.findById(bookingId);
     if (!booking) return res.status(404).json({ error: "Booking not found" });
@@ -28,8 +27,7 @@ exports.bookingStatus = async (req, res) => {
         await booking.save();
 
         // Process refund
-        const refundResult = await processRefund(booking.transaction_id);
-        console.log(refundResult);
+        const refundResult = await processRefund(booking);
         if (refundResult.error) {
           return res.status(500).json({ error: "Failed to process refund", details: refundResult.error });
         }
@@ -50,7 +48,7 @@ exports.bookingStatus = async (req, res) => {
   }
 };
 
-const processRefund = async (paymentId) => {
+const processRefund = async (booking) => {
   try {
     // Refund details
     const refundDetails = {
@@ -62,7 +60,9 @@ const processRefund = async (paymentId) => {
     };
 
     // Create a refund
-    const refund = await razorpay.payments.refund(paymentId, refundDetails);
+    const refund = await razorpay.payments.refund(booking.transaction_id, refundDetails);
+    booking.refundId = refund.id;
+    await booking.save();
     console.log('Refund successful:', refund);
     return refund;
   } catch (error) {
