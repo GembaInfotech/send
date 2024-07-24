@@ -4,8 +4,8 @@ const { generateBookingCode } = require('../codeHandler/Code');
 exports.createBooking = async (req, res) => {
   try {
     const user = req?.code;
-    console.log(user)
-    console.log(req.body.bookingData)
+    // console.log(user)
+    // console.log(req.body.bookingData)
    
     const {
       

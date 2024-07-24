@@ -6,7 +6,7 @@ const {viewVehicleList} = require('../handlers/VehicleHandler/viewVehicleList')
 
 exports.create_new_vehicle = async(req, res)=>{
     try {
-     
+        console.log(req.body)
         await createVehicle(req,res)
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
