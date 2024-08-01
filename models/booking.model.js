@@ -23,7 +23,9 @@ const bookingSchema = new mongoose.Schema({
   cancelledAt:String,
   refundId:String,
   actualInTime:String,
-  
+  vendor:String,
+  vendorCode:String,
+  vendorName:String,
   parkingCode:String,
   actualOutTime:String,
   duration:Number,

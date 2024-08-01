@@ -368,8 +368,9 @@ const addUser = async (req, res, next) => {
     
 
   } catch (err) {
+    
     res.status(400).json({
-      message: "Failed to add user",
+      message: err.message,
     });
   }
 };
