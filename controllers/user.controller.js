@@ -51,6 +51,9 @@ const signin = async (req, res, next) => {
     const existingUser = await User.findOne({
       email: { $regex: new RegExp(email, 'i') },
     });
+
+    console.log("testing21......");
+    
     if (!existingUser) {
       await saveLogInfo(
         req,
@@ -64,10 +67,16 @@ const signin = async (req, res, next) => {
       });
     }
 
+    console.log("testing31......");
+
+
     const isPasswordCorrect = await bcrypt.compare(
       password,
       existingUser.password
     );
+
+    console.log("testing41......");
+
 
     if (!isPasswordCorrect) {
       await saveLogInfo(
@@ -81,12 +90,14 @@ const signin = async (req, res, next) => {
         message: "Invalid credentials",
       });
     }
+    console.log("testing51......");
 
     const isContextAuthEnabled = await UserPreference.findOne({
       user: existingUser._id,
       enableContextBasedAuth: true,
     });
 
+    console.log("testing61......");
 
     if (isContextAuthEnabled) {
       const contextDataResult = await verifyContextData(req, existingUser);
@@ -163,6 +174,9 @@ const signin = async (req, res, next) => {
       }
     }
 
+    console.log("testing71......");
+
+
     try{ 
       const existingToken = await Token.findOne({
         user: { $eq: existingUser._id.toString() },
@@ -180,12 +194,16 @@ const signin = async (req, res, next) => {
       })
     }
 
+    console.log("testing91......");
 
     const payload = {
       id: existingUser._id,
       code:existingUser?.code,
       email: existingUser.email,
     };
+
+    console.log("testing101......");
+
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: "2h",
@@ -201,7 +219,8 @@ const signin = async (req, res, next) => {
     });
     await newRefreshToken.save();
 
-    
+    console.log("testing111......");
+
     res.status(200).json({
       accessToken,
       refreshToken,

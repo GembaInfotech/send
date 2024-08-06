@@ -61,7 +61,7 @@ router.post(
 router.post("/refresh-token", refreshToken);
 router.post(
   "/signin",
-  // signUpSignInLimiter,
+  signUpSignInLimiter,
   requestIp.mw(),
   useragent.express(),
   signin,
