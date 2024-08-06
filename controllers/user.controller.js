@@ -318,7 +318,7 @@ const addUser = async (req, res, next) => {
   let newUser;
 
   console.log(req.body)
-  console.log(req.files[0])
+  // console.log(req.files[0])
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   /**
    * @type {boolean} isConsentGiven
