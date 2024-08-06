@@ -2,7 +2,8 @@
 
 require("dotenv").config();
 const express = require("express");
-
+const multer = require('multer');
+const path = require('path');
 const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
 const postRoutes = require("./routes/post.route");
@@ -37,6 +38,49 @@ const db = new Database(process.env.MONGODB_URI, {
 db.connect().catch((err) =>
   console.error("Error connecting to database:", err)
 );
+
+
+app.use('/userAvatars', express.static(path.join(__dirname, '../../assets/userAvatars')));
+
+const storage = multer.diskStorage({
+	destination: './uploads/',
+	filename: (req, file, cb) => {
+	  cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+	}
+  });
+  
+  // Init upload
+  const upload = multer({
+	storage: storage,
+	limits: { fileSize: 1000000 }, // Set file size limit (optional)
+	fileFilter: (req, file, cb) => {
+	  checkFileType(file, cb);
+	}
+  }).any(); // .any() to accept all files, you can use .single('fieldname') for specific field
+  
+  // Check file type
+  function checkFileType(file, cb) {
+	// Allowed ext
+	const filetypes = /jpeg|jpg|png|gif/;
+	// Check ext
+	const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+	// Check mime
+	const mimetype = filetypes.test(file.mimetype);
+  
+	if (mimetype && extname) {
+	  return cb(null, true);
+	} else {
+	  cb('Error: Images Only!');
+	}
+  }
+  
+  // Use the multer middleware globally
+  app.use(upload);
+  
+  // Your other middlewares
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  
 
 app.use(cors());
 app.use(morgan("dev"));

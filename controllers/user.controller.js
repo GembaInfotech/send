@@ -318,6 +318,7 @@ const addUser = async (req, res, next) => {
   let newUser;
 
   console.log(req.body)
+  console.log(req.files[0])
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   /**
    * @type {boolean} isConsentGiven
@@ -337,7 +338,7 @@ const addUser = async (req, res, next) => {
 
   const emailDomain = req.body.email.split("@")[1];
   const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
-  const strings =  uploadPhoto();
+  // const strings =  uploadPhoto();
 
   newUser = new User({
     name: req.body.name,
