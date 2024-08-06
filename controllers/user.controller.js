@@ -48,9 +48,23 @@ const signin = async (req, res, next) => {
   try {
     const  { email, password } = req.body;
     console.log(req.body)
-    const existingUser = await User.findOne({
-      email: { $regex: new RegExp(email, 'i') },
-    });
+    try {
+      const existingUser = await User.findOne({
+        email: { $regex: new RegExp(email, 'i') },
+      });
+    
+      if (existingUser) {
+        // Handle case when the user is found
+        console.log('User already exists:', existingUser);
+      } else {
+        // Handle case when the user is not found
+        console.log('No user found with that email');
+      }
+    } catch (error) {
+      // Handle any errors that occur during the find operation
+      console.error('Error finding user:', error);
+    }
+    
 
     console.log("testing21......");
     
