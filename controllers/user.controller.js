@@ -353,8 +353,13 @@ const addUser = async (req, res, next) => {
       code: newUser?.code,
       email: newUser.email,
     };
-
-    const accessToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "2h" });
+    
+    try {
+      const accessToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "2h" });
+      console.log('Generated Access Token:', accessToken);
+    } catch (err) {
+      console.error('Error generating token:', err);
+    }
 
     console.log('Access Token:', accessToken);
 
