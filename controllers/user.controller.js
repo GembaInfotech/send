@@ -317,57 +317,46 @@ const getUser = async (req, res, next) => {
 const addUser = async (req, res, next) => {
   let newUser;
 
-  console.log(req.body)
-  // console.log(req.files[0])
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  /**
-   * @type {boolean} isConsentGiven
-   *  
-   * 
-   */
-
-  const isConsentGiven = JSON.parse(req.body.isConsentGiven);
-  const defaultAvatar =
-    "https://raw.githubusercontent.com/nz-m/public-files/main/dp.jpg";
-  const fileUrl = req.files?.[0]?.filename
-    ? `${req.protocol}://${req.get("host")}/assets/userAvatars/${
-        req.files[0].filename
-      }`
-    : defaultAvatar;
-
-
-  const emailDomain = req.body.email.split("@")[1];
-  const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
-  // const strings =  uploadPhoto();
-
-  newUser = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: hashedPassword,
-    role: role,
-    avatar: fileUrl,
-  });
+  console.log('Request Body:', req.body);
+  console.log('Files:', req.files);
 
   try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const isConsentGiven = JSON.parse(req.body.isConsentGiven);
+    const defaultAvatar = "https://raw.githubusercontent.com/nz-m/public-files/main/dp.jpg";
+    const fileUrl = req.files?.[0]?.filename
+      ? `${req.protocol}://${req.get("host")}/assets/userAvatars/${req.files[0].filename}`
+      : defaultAvatar;
+
+    const emailDomain = req.body.email.split("@")[1];
+    const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
+
+    newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: hashedPassword,
+      role: role,
+      avatar: fileUrl,
+    });
+
     await newUser.save();
     const code = await generateUserCode();
     newUser.code = code;
     await newUser.save();
-  
+
     if (newUser.isNew) {
       throw new Error("Failed to add user");
     }
 
-
     const payload = {
       id: newUser._id,
-      code:newUser?.code,
+      code: newUser?.code,
       email: newUser.email,
     };
 
-    const accessToken = jwt.sign(payload, process.env.SECRET, {
-      expiresIn: "2h",
-    });
+    const accessToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "2h" });
+
+    console.log('Access Token:', accessToken);
 
     if (isConsentGiven === false) {
       res.status(201).json({
@@ -375,21 +364,21 @@ const addUser = async (req, res, next) => {
         user: newUser,
         accessToken,
         accessTokenUpdatedAt: new Date().toLocaleString(),
-
       });
     } else {
+      console.log('Consent not given, passing to next middleware');
       next();
-
     }
-    
 
   } catch (err) {
-    
+    console.error('Error during user addition:', err.message);
+
     res.status(400).json({
       message: err.message,
     });
   }
 };
+
 
 const logout = async (req, res) => {
   try {
