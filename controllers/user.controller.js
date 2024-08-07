@@ -361,6 +361,7 @@ const addUser = async (req, res, next) => {
     if (isConsentGiven === false) {
       res.status(201).json({
         message: "User added successfully",
+        user: newUser
       });
     } else {
       next();
