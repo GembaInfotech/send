@@ -358,10 +358,24 @@ const addUser = async (req, res, next) => {
       throw new Error("Failed to add user");
     }
 
+
+    const payload = {
+      id: newUser._id,
+      code:newUser?.code,
+      email: newUser.email,
+    };
+
+    const accessToken = jwt.sign(payload, process.env.SECRET, {
+      expiresIn: "2h",
+    });
+
     if (isConsentGiven === false) {
       res.status(201).json({
         message: "User added successfully",
-        user: newUser
+        user: newUser,
+        accessToken,
+        accessTokenUpdatedAt: new Date().toLocaleString(),
+
       });
     } else {
       next();
