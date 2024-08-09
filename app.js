@@ -256,7 +256,7 @@ app.post('/verification', (req, res) => {
 
 app.post('/razorpay', async (req, res) => {
     const payment_capture = 1;
-    const amount = req.body.amount; // Ensure you're getting 'amount' from the right place in req.body
+    const amount = req.body.body; // Ensure you're getting 'amount' from the right place in req.body
     const currency = 'INR';
 
     const options = {
