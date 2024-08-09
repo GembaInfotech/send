@@ -255,28 +255,34 @@ app.post('/verification', (req, res) => {
 })
 
 app.post('/razorpay', async (req, res) => {
-	const payment_capture = 1
-	const amount = req.body.body
-	const currency = 'INR'
+    const payment_capture = 1;
+    const amount = req.body.amount; // Ensure you're getting 'amount' from the right place in req.body
+    const currency = 'INR';
 
-	const options = {
-		amount: amount * 100,
-		currency,
-		receipt: shortid.generate(),
-		payment_capture
-	}
+    const options = {
+        amount: amount * 100, // Razorpay expects amount in paise
+        currency,
+        receipt: shortid.generate(),
+        payment_capture
+    };
 
-	try {
-		const response = await razorpay.orders.create(options)
-		res.json({
-			id: response.id,
-			currency: response.currency,
-			amount: response.amount
-		})
-	} catch (error) {
-		console.log(error)
-	}
-})
+    try {
+        const response = await razorpay.orders.create(options);
+        res.json({
+            id: response.id,
+            currency: response.currency,
+            amount: response.amount
+        });
+    } catch (error) {
+        console.error('Razorpay Order Creation Error:', error);
+
+        res.status(500).json({
+            statusCode: 500,
+            error: 'An error occurred while creating the Razorpay order.',
+            details: error.message // Provides more insight into what went wrong
+        });
+    }
+});
 
 
 
