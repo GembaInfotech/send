@@ -98,13 +98,23 @@ exports.createBooking = async (req, res) => {
       parkingCode
     } = req.body.bookingData;
 
+    console.log("parkingId", parking);
+    
+
     // Retrieve parking details using the parking ID
-    const parkingDetails = await parkingModel.findById(parking);
-    if (!parkingDetails) {
-      return res.status(404).json({ error: "Parking not found" });
-    }
+    try {
+      const parkingDetails = await parkingModel.findById(parking);
+      // if (!parkingDetails) {
+      //     return res.status(404).json({ error: "Parking not found" });
+      // }
+  } catch (error) {
+      console.error("Error finding parking:", error);
+      return res.status(500).json({ error: "Internal server error" });
+  }
+  
 
     const vendorId = parkingDetails.vendor_id;
+    console.log("parking id", vendorId)
     const vendorDetails = await vendorModel.findById(vendorId);
     if (!vendorDetails) {
       return res.status(404).json({ error: "Vendor not found" });
