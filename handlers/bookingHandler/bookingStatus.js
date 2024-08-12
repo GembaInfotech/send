@@ -40,7 +40,7 @@ exports.bookingStatus = async (req, res) => {
         res.status(500).json({ error: "Failed to update booking status or process refund", details: err });
       }
     } else {
-      res.status(400).json({ message: "You can cancel your booking only before 3 hours of your inTime" });
+      res.status(400).json({ message: "You can cancel your booking only up to 3 hours before your check-in time." });
     }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
