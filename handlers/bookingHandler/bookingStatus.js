@@ -31,7 +31,6 @@ exports.bookingStatus = async (req, res) => {
         if (refundResult.error) {
           return res.status(500).json({ error: "Failed to process refund", details: refundResult.error });
         }
-
         res.status(200).json({
           message: "Booking status updated and refund processed successfully",
           data: booking,
