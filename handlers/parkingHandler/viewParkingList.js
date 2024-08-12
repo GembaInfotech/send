@@ -6,6 +6,10 @@ exports.viewParkingList = async (req, res) => {
     const {latitude} = req.query
     const {longitude} =req.query
     const {outTime} = req.query
+    const {inTime} = req.query
+    const inDate = inTime.split("T")[0]
+    console.log(inDate);
+    console.log(inTime);
     const outDate = outTime.split("T")[0]
     console.log(outDate);
     console.log(outTime);
