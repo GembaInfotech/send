@@ -6,7 +6,7 @@ exports.setVehicleDefault = async (req, res) => {
     const { vehicle_name, vehicle_number, vehicle_type } = req.body;
 
     try {
-        const user = await UserModel.findOne({_id:userId});
+        const user = await User.findOne({_id:userId});
         if (!user) {
             return res.status(404).json({
                 success: false,
