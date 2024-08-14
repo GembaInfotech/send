@@ -32,6 +32,7 @@ exports.set_vehicle_default = async(req, res)=>{
 
 exports.update_vehicle = async(req, res)=>{
     try {
+        console.log('hello.....')
         await updateVehicle(req,res)
     } catch (error) {
         console.error(error);

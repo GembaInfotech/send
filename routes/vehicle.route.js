@@ -9,7 +9,7 @@ const vehicleController = require('../controllers/vehicle.controller')
 
 router.route('/create-new-vehicle').post( decodeToken,  vehicleController.create_new_vehicle);
 
-  router.route('update-vehicle/:vehicleId').put( vehicleController.update_vehicle);
+  router.route('/update-vehicle/:vehicleId').put( decodeToken, vehicleController.update_vehicle);
 
   router.route('set-vehicle-default/:vehicleId').put( vehicleController.set_vehicle_default);
 
