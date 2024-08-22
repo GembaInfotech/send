@@ -236,7 +236,7 @@ app.get('/getrefund',  async (req,res)=>{
 app.post('/verification', (req, res) => {
 	// do a validation
 	const secret = 'Pr8ALVkn1EA6H7iDMqJY8yVL'
-
+	console.log("razorpay payment details", req.body);
 
 	const crypto = require('crypto')
   let body = req.body.response.razorpay_order_id + "|" + req.body.response.razorpay_payment_id;
@@ -256,11 +256,14 @@ app.post('/verification', (req, res) => {
 
 app.post('/razorpay', async (req, res) => {
     const payment_capture = 1;
-    const amount = req.body.body; // Ensure you're getting 'amount' from the right place in req.body
+    const amount = req.body.body;
+
+	console.log("razorpay", req.body);
+	
     const currency = 'INR';
 
     const options = {
-        amount: amount * 100, // Razorpay expects amount in paise
+        amount: amount * 100, 
         currency,
         receipt: shortid.generate(),
         payment_capture

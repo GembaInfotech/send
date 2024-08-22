@@ -4,15 +4,11 @@ const bookingSchema = new mongoose.Schema({
   code:{
     type:String
   },
-  user: {
-    type: String
-  },
-  parking: {
-    type: String 
-  },
-  parkingName:{
-    type:String
-  },
+  parking: { type: mongoose.Schema.Types.ObjectId, ref: 'Parking' },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  vehicleId: { type: mongoose.Schema.Types.ObjectId },
+  vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'VendorModel' },
+
   inTime: {
     type: String,
   },
@@ -23,16 +19,12 @@ const bookingSchema = new mongoose.Schema({
   cancelledAt:String,
   refundId:String,
   actualInTime:String,
-  vendor:String,
-  vendorCode:String,
-  vendorName:String,
-  parkingCode:String,
   actualOutTime:String,
   duration:Number,
   actualDuration:Number,
   BookingDate:String,
   exceedTime: Number,
-  vehicleNumber: String,
+
   price: Number,
   cgst: Number,
   sgst: Number,
@@ -42,9 +34,7 @@ const bookingSchema = new mongoose.Schema({
   exceedTotalPrice:Number,
   totalPrice: Number,
   bookingPrice:Number,
-  vehicle_name:String,
-      vehicle_number:String,
-      vehicle_type:String,
+  
       transaction_id :String,
       order_id :String,
   paymentId:String,
