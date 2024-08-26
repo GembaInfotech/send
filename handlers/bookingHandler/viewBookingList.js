@@ -20,7 +20,7 @@ exports.viewBookingList = async (req, res) => {
       .populate({
         path: 'parking',
         model: 'ParkingModel',
-        select: 'name location',
+        select: 'name location pincode address_line1 address_line2 city state country landmark mobile_no',
       })
       .populate({
         path: 'user',
@@ -30,7 +30,7 @@ exports.viewBookingList = async (req, res) => {
       .populate({
         path: 'vendor',
         model: 'VendorModel',
-        select: 'firstName lastName email',
+        select: 'firstName lastName email communicationAddress.contact',
       })
       .exec();
 

@@ -188,7 +188,7 @@ const signin = async (req, res, next) => {
     };
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
-      expiresIn: "2h",
+      expiresIn: "7d",
     });
 
     const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET, {
