@@ -23,7 +23,9 @@ exports.view_vehicle_list = async(req, res)=>{
 
 exports.set_vehicle_default = async(req, res)=>{
     try {
+        console.log("vehcile")
         await setVehicleDefault(req,res)
+
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' }); 
 
