@@ -3,9 +3,20 @@ const Booking = require('../../models/booking.model');
 exports.viewBookingList = async (req, res) => {
   try {
     const user = req.userId;
-    console.log(`User ID: ${user}`);
+    const { status } = req.query;
 
-    const bookings = await Booking.find({ user: user })
+    console.log(`User ID: ${user}`);
+    console.log(`Status Query: ${status}`);
+
+    const filter = { user: user };
+    const validStatuses = ["Pending", "Incoming", "Parked", "Completed", "Confirmed", "Cancelled"];
+
+    if (status) {
+      const statusArray = Array.isArray(status) ? status : [status];
+      filter.status = { $in: statusArray.filter(s => validStatuses.includes(s)) };
+    }
+
+    const bookings = await Booking.find(filter)
       .populate({
         path: 'parking',
         model: 'ParkingModel',
@@ -28,13 +39,11 @@ exports.viewBookingList = async (req, res) => {
         const matchedVehicle = booking.user.vehicle.find(vehicle => 
           vehicle._id && vehicle._id.toString() === booking.vehicleId.toString()
         );
-        
         return {
           ...booking.toObject(),
           vehicle: matchedVehicle || null, 
         };
       }
-
       return booking.toObject();
     });
 
