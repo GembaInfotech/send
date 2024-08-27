@@ -349,7 +349,7 @@ const addUser = async (req, res) => {
     savedUser.activationToken = activationToken
     savedUser.activationExpires = Date.now() + 3600000
     await savedUser.save()
-    const activationLink = `http://localhost:4005/activate/activate-account/${activationToken}`;
+    const activationLink = `http://vistaerp.gembainfotech.com:4005/activate/activate-account/${activationToken}`;
 
     // Send the activation email
     await sendActivationEmail("s.yadav@gembainfotech.com", activationLink);
