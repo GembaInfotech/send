@@ -352,7 +352,7 @@ const addUser = async (req, res) => {
     const activationLink = `http://vistaerp.gembainfotech.com:4005/activate/activate-account/${activationToken}`;
 
     // Send the activation email
-    await sendActivationEmail("s.yadav@gembainfotech.com", activationLink);
+    await sendActivationEmail(savedUser.email, activationLink);
 
     res.status(201).json({
       message: "User added successfully. Please check your email to activate your account.",
