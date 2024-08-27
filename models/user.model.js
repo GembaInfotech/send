@@ -46,7 +46,12 @@ const userSchema = new Schema(
     },
    
    
-  
+    activationToken: String,
+    activationExpires: Date,
+    isActivated: {
+      type: Boolean,
+      default: false,
+    },
  
     vehicle: [
       {

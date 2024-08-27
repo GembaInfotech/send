@@ -40,17 +40,20 @@ const MESSAGE = {
 const signin = async (req, res, next) => {
   await saveLogInfo(
     req,
-    "User attempting to sign in",
+    MESSAGE.SIGN_IN_ATTEMPT,
     LOG_TYPE.SIGN_IN,
     LEVEL.INFO
   );
 
   try {
-    const  { email, password } = req.body;
-    console.log(req.body)
+    const { email, password } = req.body;
+    console.log(req.body);
     const existingUser = await User.findOne({
       email: { $regex: new RegExp(email, 'i') },
     });
+
+    
+    
     if (!existingUser) {
       await saveLogInfo(
         req,
@@ -64,10 +67,21 @@ const signin = async (req, res, next) => {
       });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
+    // Check if the account is activated
+    if (!existingUser.isActivated) {
+      await saveLogInfo(
+        req,
+        "Account not activated",
+        LOG_TYPE.SIGN_IN,
+        LEVEL.ERROR
+      );
+
+      return res.status(403).json({
+        message: "Account not activated. Please check your email to activate your account.",
+      });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
     if (!isPasswordCorrect) {
       await saveLogInfo(
@@ -87,7 +101,6 @@ const signin = async (req, res, next) => {
       enableContextBasedAuth: true,
     });
 
-
     if (isContextAuthEnabled) {
       const contextDataResult = await verifyContextData(req, existingUser);
 
@@ -100,15 +113,11 @@ const signin = async (req, res, next) => {
         );
 
         return res.status(401).json({
-          message:
-            "You've been blocked due to suspicious login activity. Please contact support for assistance.",
+          message: "You've been blocked due to suspicious login activity. Please contact support for assistance.",
         });
       }
 
-      if (
-        contextDataResult === types.NO_CONTEXT_DATA ||
-        contextDataResult === types.ERROR
-      ) {
+      if (contextDataResult === types.NO_CONTEXT_DATA || contextDataResult === types.ERROR) {
         await saveLogInfo(
           req,
           MESSAGE.CONTEXT_DATA_VERIFY_ERROR,
@@ -163,27 +172,23 @@ const signin = async (req, res, next) => {
       }
     }
 
-    try{ 
+    try {
       const existingToken = await Token.findOne({
         user: { $eq: existingUser._id.toString() },
       });
       if (existingToken?.user) {
-        await Token.deleteOne({ _id:existingToken._id });
-            
+        await Token.deleteOne({ _id: existingToken._id });
       }
-
-    }catch(err)
-    {
+    } catch (err) {
       res.json({
-        "success":"false",
-         err:err
-      })
+        success: "false",
+        err: err,
+      });
     }
-
 
     const payload = {
       id: existingUser._id,
-      code:existingUser?.code,
+      code: existingUser?.code,
       email: existingUser.email,
     };
 
@@ -201,7 +206,6 @@ const signin = async (req, res, next) => {
     });
     await newRefreshToken.save();
 
-    
     res.status(200).json({
       accessToken,
       refreshToken,
@@ -227,6 +231,7 @@ const signin = async (req, res, next) => {
     });
   }
 };
+
 
 /**
  * Retrieves a user's profile information, including their total number of posts,
@@ -313,70 +318,112 @@ const getUser = async (req, res, next) => {
  * 
  */
 
+// const crypto = require('crypto');
+const nodemailer = require('nodemailer')
 
-const addUser = async (req, res, next) => {
-  let newUser;
-
-  console.log('Request Body:', req.body);
-  console.log('Files:', req.files);
-
+const addUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const isConsentGiven = JSON.parse(req.body.isConsentGiven);
-    const defaultAvatar = "https://raw.githubusercontent.com/nz-m/public-files/main/dp.jpg";
-    const fileUrl = req.files?.[0]?.filename
-      ? `${req.protocol}://${req.get("host")}/assets/userAvatars/${req.files[0].filename}`
-      : defaultAvatar;
 
-    const emailDomain = req.body.email.split("@")[1];
-    const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
+    // const emailDomain = req.body.email.split("@")[1];
+    // const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
 
-    newUser = new User({
+    const newUser = new User({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      role: role,
-      avatar: fileUrl,
+      // role: role,
     });
 
-    await newUser.save();
-    const code = await generateUserCode();
-    newUser.code = code;
-    await newUser.save();
-
-    if (newUser.isNew) {
+    const savedUser = await newUser.save();
+    
+    if (!savedUser) {
       throw new Error("Failed to add user");
     }
 
-    const payload = {
-      id: newUser._id,
-      code: newUser?.code,
-      email: newUser.email,
-    };
+    const activationToken = jwt.sign(
+      { id: savedUser._id, email: savedUser.email },
+      process.env.SECRET,
+      { expiresIn: "1d" }  // Token valid for 1 day
+    );
+    savedUser.activationToken = activationToken
+    savedUser.activationExpires = Date.now() + 3600000
+    await savedUser.save()
+    const activationLink = `http://localhost:4005/activate/activate-account/${activationToken}`;
 
-    const accessToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "2h" });
+    // Send the activation email
+    await sendActivationEmail("s.yadav@gembainfotech.com", activationLink);
 
-    console.log('Access Token:', accessToken);
-
-    if (isConsentGiven === false) {
-      res.status(201).json({
-        message: "User added successfully",
-        user: newUser,
-        accessToken,
-        accessTokenUpdatedAt: new Date().toLocaleString(),
-      });
-    } else {
-      console.log('Consent not given, passing to next middleware');
-      next();
-    }
-
+    res.status(201).json({
+      message: "User added successfully. Please check your email to activate your account.",
+    });
   } catch (err) {
     console.error('Error during user addition:', err.message);
-
     res.status(400).json({
       message: err.message,
     });
   }
+};
+
+// Helper function to send the activation email
+const sendActivationEmail = async (email, link) => {
+  // Add your email sending logic here
+  // For example, using Nodemailer:
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: "prashantrana9516@gmail.com",
+      pass: "qqjsatrjwvbynknu",
+    },
+  });
+
+  const mailOptions = {
+    from: "prashantrana9516@gmail.com",
+    to: email,
+    subject: 'Activate Your Account',
+    html: `<p>Please click the following link to activate your account:</p><a href="${link}">${link}</a>`,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+
+
+// const upload = require('./uploadService');
+const upload = require('../services/UploadProfile')
+
+const uploadProfileImage = async (req, res) => {
+  console.log("hello1");
+  
+  upload.single('profileImage')(req, res, async (err) => {
+    console.log(req.file);
+    
+    if (err) {
+      return res.status(500).json({ message: 'Error uploading image', error: err });
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+console.log("hello3");
+
+    try {
+
+      console.log("hello");
+      
+      const userId = req.userId; // Assuming req.userId is set by your authentication middleware
+      const filePath = `/profileImage/UserProfileImg/${req.file.filename}`;
+
+      // Update user's avatar field with the uploaded image path
+      await User.findByIdAndUpdate(userId, { avatar: filePath }, { new: true });
+
+      res.status(200).json({
+        message: 'File uploaded successfully',
+        filePath: filePath,
+      });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err });
+    }
+  });
 };
 
 
@@ -526,4 +573,5 @@ module.exports = {
   getModProfile,
   getUser,
   updateInfo,
+  uploadProfileImage
 };

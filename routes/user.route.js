@@ -12,6 +12,8 @@ const {
   getModProfile,
   getUser,
   updateInfo,
+  uploadProfileImage
+
 } = require("../controllers/user.controller");
 
 const {
@@ -58,6 +60,9 @@ router.post(
   addUser,
   sendVerificationEmail
 );
+
+
+router.post("/uploadProfileImg", decodeToken, uploadProfileImage )
 router.post("/refresh-token", refreshToken);
 router.post(
   "/signin",

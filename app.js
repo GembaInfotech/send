@@ -1,5 +1,3 @@
-
-
 require("dotenv").config();
 const express = require("express");
 const multer = require('multer');
@@ -20,7 +18,8 @@ const paymentRoute = require('./routes/paymentRoute.js')
 const guardRoutes = require('./routes/guard.route.js')
 const addressDetailRoute = require('./routes/AddressDetailRoute.js')
 const resetPasswordRoute = require("./routes/forgetPasswordRoute.js")
-
+const activateAccountRoute = require("./routes/activateAccountRoute.js")
+// const file = require('./profileImage/UserProfileImg')
 
 const app = express();
 
@@ -40,7 +39,8 @@ db.connect().catch((err) =>
 );
 
 
-app.use('/userAvatars', express.static(path.join(__dirname, '../../assets/userAvatars')));
+app.use('/ProfileImage', express.static(path.join(__dirname, 'ProfileImage')));
+// app.use('/userAvatars', express.static(path.join(__dirname, '../../assets/userAvatars')));
 
 const storage = multer.diskStorage({
 	destination: './uploads/',
@@ -116,6 +116,7 @@ app.use("/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
 app.use("/guard", guardRoutes)
 app.use("/add", addressDetailRoute)
+app.use("/activate", activateAccountRoute)
 
 
 

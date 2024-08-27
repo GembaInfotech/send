@@ -18,7 +18,7 @@ exports.forgotPassword = async (req, res) => {
     }
         const forgetToken = crypto.randomBytes(20).toString('hex');
         await forgetPassword.create({ userId: user._id, email: email, token: forgetToken, verified: '0' });
-        const resetUrl = "http://vistaerp.gembainfotech.com:4005/#/reset-password/" + forgetToken + "/";
+        const resetUrl = "http://localhost:3000/#/reset-password/" + forgetToken + "/";
         const Data = {
             email: email,
             link: resetUrl
