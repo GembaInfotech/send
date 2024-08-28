@@ -3,19 +3,29 @@ const Booking = require('../../models/booking.model');
 exports.viewBookingList = async (req, res) => {
   try {
     const user = req.userId;
-    const { status } = req.query;
+    const { status, bookingId } = req.query;
 
     console.log(`User ID: ${user}`);
     console.log(`Status Query: ${status}`);
+    console.log(`Booking ID Query: ${bookingId}`);
 
+    // Initialize filter
     const filter = { user: user };
     const validStatuses = ["Pending", "Incoming", "Parked", "Completed", "Confirmed", "Cancelled"];
 
-    if (status) {
-      const statusArray = Array.isArray(status) ? status : [status];
-      filter.status = { $in: statusArray.filter(s => validStatuses.includes(s)) };
+    // Check if bookingId is provided
+    if (bookingId) {
+      // If bookingId is provided, filter by it
+      filter._id = bookingId; // Ensure to include bookingId filter
+    } else {
+      // Only apply status filter if bookingId is not provided
+      if (status) {
+        const statusArray = Array.isArray(status) ? status : [status];
+        filter.status = { $in: statusArray.filter(s => validStatuses.includes(s)) };
+      }
     }
 
+    // Fetch bookings based on the constructed filter
     const bookings = await Booking.find(filter)
       .populate({
         path: 'parking',
@@ -34,6 +44,7 @@ exports.viewBookingList = async (req, res) => {
       })
       .exec();
 
+    // Filter out vehicles based on vehicleId
     const filteredBookings = bookings.map(booking => {
       if (booking.vehicleId && booking.user && booking.user.vehicle) {
         const matchedVehicle = booking.user.vehicle.find(vehicle => 
@@ -60,3 +71,4 @@ exports.viewBookingList = async (req, res) => {
     });
   }
 };
+

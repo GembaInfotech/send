@@ -28,6 +28,8 @@ exports.viewParkingList = async (req, res) => {
 
      }).populate('vendor_id', 'firstName lastName communicationAddress.contact communicationAddress.email');
 
+     console.log("data", parkings)
+
     res.status(200).json({
       success: true,
       data: parkings
