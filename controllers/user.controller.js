@@ -12,6 +12,7 @@ const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const { generateUserCode } = require("../handlers/codeHandler/Code");
 const { uploadPhoto } = require("../middlewares/ImageUpload/upload");
+const multer = require('multer');
 dayjs.extend(duration);
 
 const LOG_TYPE = {
@@ -387,31 +388,74 @@ const sendActivationEmail = async (email, link) => {
   await transporter.sendMail(mailOptions);
 };
 
+// const bcrypt = require('bcrypt');
+
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.userId; // Assume `userId` is set in `req` by some middleware
+    const { currentPassword, newPassword } = req.body;
+
+    // Find the user by userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if the current password is correct
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user with the new password
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('Error changing password:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
 // const upload = require('./uploadService');
 const upload = require('../services/UploadProfile')
+// controller.js or your specific controller file
+// const User = require('./path/to/userModel'); // Adjust the path accordingly
 
 const uploadProfileImage = async (req, res) => {
-  console.log("hello1");
-  
-  upload.single('profileImage')(req, res, async (err) => {
-    console.log(req.file);
-    
-    if (err) {
-      return res.status(500).json({ message: 'Error uploading image', error: err });
+  console.log("Entering uploadProfileImage");
+
+  // Invoke the Multer middleware correctly
+  upload.single('./profileImage/UserProfileImage')(req, res, async (err) => {
+    console.log("Multer middleware executed");
+
+    if (err instanceof multer.MulterError) {
+      // Multer-specific errors
+      console.error("Multer error:", err);
+      return res.status(500).json({ message: 'Multer Error uploading image', error: err.message });
+    } else if (err) {
+      // Other errors
+      console.error("Error in multer:", err);
+      return res.status(500).json({ message: 'Error uploading image', error: err.message });
     }
-    if (!req.file) {
+
+    if (!req.file) { // Use req.file for single file uploads
+      console.warn("No file uploaded");
       return res.status(400).json({ message: 'No file uploaded' });
     }
-console.log("hello3");
+
+    console.log("File uploaded successfully:", req.file);
 
     try {
-
-      console.log("hello");
-      
-      const userId = req.userId; // Assuming req.userId is set by your authentication middleware
+      const userId = req.userId; // Ensure this is set by your authentication middleware
       const filePath = `/profileImage/UserProfileImg/${req.file.filename}`;
+
+      console.log(`Updating user ${userId} with file path: ${filePath}`);
 
       // Update user's avatar field with the uploaded image path
       await User.findByIdAndUpdate(userId, { avatar: filePath }, { new: true });
@@ -421,10 +465,15 @@ console.log("hello3");
         filePath: filePath,
       });
     } catch (err) {
-      res.status(500).json({ message: 'Server error', error: err });
+      console.error("Server error:", err);
+      res.status(500).json({ message: 'Server error', error: err.message });
     }
   });
 };
+
+// module.exports = { uploadProfileImage };
+
+
 
 
 const logout = async (req, res) => {
@@ -573,5 +622,6 @@ module.exports = {
   getModProfile,
   getUser,
   updateInfo,
-  uploadProfileImage
+  uploadProfileImage, 
+  changePassword,
 };

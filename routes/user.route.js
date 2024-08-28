@@ -12,7 +12,8 @@ const {
   getModProfile,
   getUser,
   updateInfo,
-  uploadProfileImage
+  changePassword
+  // uploadProfileImage
 
 } = require("../controllers/user.controller");
 
@@ -62,8 +63,9 @@ router.post(
 );
 
 
-router.post("/uploadProfileImg", decodeToken, uploadProfileImage )
+// router.post("/uploadProfileImg", decodeToken, uploadProfileImage )
 router.post("/refresh-token", refreshToken);
+router.post("/changePassword", decodeToken, changePassword);
 router.post(
   "/signin",
   signUpSignInLimiter,
