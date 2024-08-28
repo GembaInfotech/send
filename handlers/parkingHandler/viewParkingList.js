@@ -26,7 +26,7 @@ exports.viewParkingList = async (req, res) => {
         validity_ToDate: { $gte: outDate },
         status: 'active'
 
-     });
+     }).populate('vendor_id', 'firstName lastName communicationAddress.contact communicationAddress.email');
 
     res.status(200).json({
       success: true,
