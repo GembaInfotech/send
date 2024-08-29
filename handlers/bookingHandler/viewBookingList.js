@@ -6,6 +6,11 @@ exports.viewBookingList = async (req, res) => {
     const { status, bookingId } = req.query;
     console.log(req.query)
 
+
+
+//helloooxcvhjkjhgf
+
+
     console.log(`User ID: ${user}`);
     console.log(`Status Query: ${status}`);
     console.log(`Booking ID Query: ${bookingId}`);
