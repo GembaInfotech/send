@@ -4,6 +4,7 @@ exports.viewBookingList = async (req, res) => {
   try {
     const user = req.userId;
     const { status, bookingId } = req.query;
+    console.log(req.query)
 
     console.log(`User ID: ${user}`);
     console.log(`Status Query: ${status}`);
