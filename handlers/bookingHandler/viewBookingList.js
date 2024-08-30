@@ -3,35 +3,21 @@ const Booking = require('../../models/booking.model');
 exports.viewBookingList = async (req, res) => {
   try {
     const user = req.userId;
-    const { status, bookingId } = req.query;
-    console.log(req.query)
-
-
-
-//helloooxcvhjkjhgf
-
-
-    console.log(`User ID: ${user}`);
-    console.log(`Status Query: ${status}`);
-    console.log(`Booking ID Query: ${bookingId}`);
-
-    // Initialize filter
+    const { status, bookingId, page = 1, limit = 10 } = req.query; // Default page is 1, limit is 10
     const filter = { user: user };
     const validStatuses = ["Pending", "Incoming", "Parked", "Completed", "Confirmed", "Cancelled"];
-
-    // Check if bookingId is provided
+    
     if (bookingId) {
-      // If bookingId is provided, filter by it
-      filter._id = bookingId; // Ensure to include bookingId filter
-    } else {
-      // Only apply status filter if bookingId is not provided
-      if (status) {
-        const statusArray = Array.isArray(status) ? status : [status];
-        filter.status = { $in: statusArray.filter(s => validStatuses.includes(s)) };
-      }
+      filter._id = bookingId; 
+    } else if (status) {
+      const statusArray = Array.isArray(status) ? status : [status];
+      filter.status = { $in: statusArray.filter(s => validStatuses.includes(s)) };
     }
 
-    // Fetch bookings based on the constructed filter
+    const skip = (page - 1) * limit;
+
+    const totalDocuments = await Booking.countDocuments(filter);
+
     const bookings = await Booking.find(filter)
       .populate({
         path: 'parking',
@@ -48,9 +34,10 @@ exports.viewBookingList = async (req, res) => {
         model: 'VendorModel',
         select: 'firstName lastName email communicationAddress.contact',
       })
+      .skip(skip)
+      .limit(parseInt(limit))
       .exec();
 
-    // Filter out vehicles based on vehicleId
     const filteredBookings = bookings.map(booking => {
       if (booking.vehicleId && booking.user && booking.user.vehicle) {
         const matchedVehicle = booking.user.vehicle.find(vehicle => 
@@ -67,6 +54,12 @@ exports.viewBookingList = async (req, res) => {
     res.status(200).json({
       success: true,
       data: filteredBookings,
+      pagination: {
+        totalDocuments,
+        totalPages: Math.ceil(totalDocuments / limit),
+        currentPage: parseInt(page),
+        limit: parseInt(limit),
+      },
     });
   } catch (error) {
     console.error(`Error: ${error.message}`);
@@ -77,4 +70,5 @@ exports.viewBookingList = async (req, res) => {
     });
   }
 };
+
 
