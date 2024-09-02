@@ -324,6 +324,11 @@ const nodemailer = require('nodemailer')
 
 const addUser = async (req, res) => {
   try {
+    if (!req.body.isConsentGiven) {
+      return res.status(400).json({
+        message: "Your consent for the signup is mandatory.",
+      });
+    }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     // const emailDomain = req.body.email.split("@")[1];

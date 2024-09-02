@@ -62,8 +62,6 @@ router.post(
   sendVerificationEmail
 );
 
-
-// router.post("/uploadProfileImg", decodeToken, uploadProfileImage )
 router.post("/refresh-token", refreshToken);
 router.post("/changePassword", decodeToken, changePassword);
 router.post(
