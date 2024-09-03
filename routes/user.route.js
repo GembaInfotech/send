@@ -2,9 +2,8 @@ const router = require("express").Router();
 const passport = require("passport");
 const useragent = require("express-useragent");
 const requestIp = require("request-ip");
-
+const upload= require('../utils/UploadImage/upload')
 const {
-  
   addUser,
   signin,
   logout,
@@ -12,8 +11,8 @@ const {
   getModProfile,
   getUser,
   updateInfo,
-  changePassword
-  // uploadProfileImage
+  changePassword,
+  UploadUserProfile
 
 } = require("../controllers/user.controller");
 
@@ -25,45 +24,26 @@ const {
   getFollowingUsers,
 } = require("../controllers/profile.controller");
 
-const {
-  addUserValidator,
-  addUserValidatorHandler,
-} = require("../middlewares/users/usersValidator");
+const {addUserValidator,addUserValidatorHandler} = require("../middlewares/users/usersValidator");
 
 const { sendVerificationEmail } = require("../middlewares/users/verifyEmail");
-const {
-  sendLoginVerificationEmail,
-} = require("../middlewares/users/verifyLogin");
 
-const avatarUpload = require("../middlewares/users/avatarUpload");
-const {
-  signUpSignInLimiter,
-  followLimiter,
-} = require("../middlewares/limiter/limiter");
+const {signUpSignInLimiter,followLimiter} = require("../middlewares/limiter/limiter");
 
 const decodeToken = require("../middlewares/auth/decodeToken");
-const { uploadPhoto } = require("../middlewares/ImageUpload/upload");
 const requireAuth = passport.authenticate("jwt", { session: false }, null);
 
-
-// router.post("/create-new-user", createUser)
 router.get("/public-users/:id", requireAuth, decodeToken, getPublicUser);
 router.get("/public-users",  getPublicUsers);
 router.get("/moderator", requireAuth, decodeToken, getModProfile);
 router.get("/following", requireAuth, decodeToken, getFollowingUsers);
 router.get("/:id", requireAuth, getUser);
 
-router.post(
-  "/signup",
-  signUpSignInLimiter,
-  addUserValidator,
-  addUserValidatorHandler,
-  addUser,
-  sendVerificationEmail
-);
-
+router.post("/signup",signUpSignInLimiter,addUserValidator,addUserValidatorHandler,addUser,sendVerificationEmail);
 router.post("/refresh-token", refreshToken);
 router.post("/changePassword", decodeToken, changePassword);
+router.post("/UploadUserProfile", decodeToken, upload.single('profileImage'), UploadUserProfile);
+
 router.post(
   "/signin",
   signUpSignInLimiter,

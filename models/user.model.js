@@ -117,9 +117,13 @@ const userSchema = new Schema(
       type: String,
       required: false,
     },
-    avatar: {
+    profileImage: {
       type: String,
     },
+    profileImagePath:{
+      type: String,
+    },
+
     followers: [
       {
         type: Schema.Types.ObjectId,

@@ -10,10 +10,10 @@ const { verifyContextData, types } = require("./auth.controller");
 const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
+const path = require('path');
 const { generateUserCode } = require("../handlers/codeHandler/Code");
-const { uploadPhoto } = require("../middlewares/ImageUpload/upload");
-const multer = require('multer');
 dayjs.extend(duration);
+const nodemailer = require('nodemailer')
 
 const LOG_TYPE = {
   SIGN_IN: "sign in",
@@ -319,9 +319,6 @@ const getUser = async (req, res, next) => {
  * 
  */
 
-// const crypto = require('crypto');
-const nodemailer = require('nodemailer')
-
 const addUser = async (req, res) => {
   try {
     if (!req.body.isConsentGiven) {
@@ -331,14 +328,13 @@ const addUser = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    // const emailDomain = req.body.email.split("@")[1];
-    // const role = emailDomain === "mod.Parkar.com" ? "moderator" : "general";
-
+    const code = await generateUserCode();
+      
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      // role: role,
+      code:code
     });
 
     const savedUser = await newUser.save();
@@ -371,7 +367,6 @@ const addUser = async (req, res) => {
   }
 };
 
-// Helper function to send the activation email
 const sendActivationEmail = async (email, link) => {
   // Add your email sending logic here
   // For example, using Nodemailer:
@@ -393,7 +388,31 @@ const sendActivationEmail = async (email, link) => {
   await transporter.sendMail(mailOptions);
 };
 
-// const bcrypt = require('bcrypt');
+ const UploadUserProfile = async(req, res) => {
+  const userId = req.userId;
+  const user = await User.findById(userId);
+  if (!req.file) {
+      return res.status(400).send({ message: 'Please upload a file.' });
+  }
+
+  const profileType = req.body.profileType || 'user'; // Default to 'vendor' if not provided
+  let folder = '';
+
+  if (profileType === 'user') {
+      folder = 'UserProfileImg';
+  } else if (profileType === 'vendor') {
+      folder = 'VendorProfileImg';
+  } else {
+      return res.status(400).send({ message: 'Invalid profile type.' });
+  }
+
+  res.send({
+      message: 'File uploaded successfully!',
+      fileName: req.file.filename,
+      filePath: path.join('ProfileImage', folder, req.file.filename)
+  });
+};
+
 
 const changePassword = async (req, res) => {
   try {
@@ -425,61 +444,6 @@ const changePassword = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
-// const upload = require('./uploadService');
-const upload = require('../services/UploadProfile')
-// controller.js or your specific controller file
-// const User = require('./path/to/userModel'); // Adjust the path accordingly
-
-const uploadProfileImage = async (req, res) => {
-  console.log("Entering uploadProfileImage");
-
-  // Invoke the Multer middleware correctly
-  upload.single('./profileImage/UserProfileImage')(req, res, async (err) => {
-    console.log("Multer middleware executed");
-
-    if (err instanceof multer.MulterError) {
-      // Multer-specific errors
-      console.error("Multer error:", err);
-      return res.status(500).json({ message: 'Multer Error uploading image', error: err.message });
-    } else if (err) {
-      // Other errors
-      console.error("Error in multer:", err);
-      return res.status(500).json({ message: 'Error uploading image', error: err.message });
-    }
-
-    if (!req.file) { // Use req.file for single file uploads
-      console.warn("No file uploaded");
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    console.log("File uploaded successfully:", req.file);
-
-    try {
-      const userId = req.userId; // Ensure this is set by your authentication middleware
-      const filePath = `/profileImage/UserProfileImg/${req.file.filename}`;
-
-      console.log(`Updating user ${userId} with file path: ${filePath}`);
-
-      // Update user's avatar field with the uploaded image path
-      await User.findByIdAndUpdate(userId, { avatar: filePath }, { new: true });
-
-      res.status(200).json({
-        message: 'File uploaded successfully',
-        filePath: filePath,
-      });
-    } catch (err) {
-      console.error("Server error:", err);
-      res.status(500).json({ message: 'Server error', error: err.message });
-    }
-  });
-};
-
-// module.exports = { uploadProfileImage };
-
-
-
 
 const logout = async (req, res) => {
   try {
@@ -627,6 +591,6 @@ module.exports = {
   getModProfile,
   getUser,
   updateInfo,
-  uploadProfileImage, 
+  UploadUserProfile, 
   changePassword,
 };

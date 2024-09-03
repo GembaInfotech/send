@@ -19,7 +19,9 @@ const guardRoutes = require('./routes/guard.route.js')
 const addressDetailRoute = require('./routes/AddressDetailRoute.js')
 const resetPasswordRoute = require("./routes/forgetPasswordRoute.js")
 const activateAccountRoute = require("./routes/activateAccountRoute.js")
-// const file = require('./profileImage/UserProfileImg')
+
+const upload = require('./utils/UploadImage/upload.js');
+
 
 const app = express();
 
@@ -39,43 +41,43 @@ db.connect().catch((err) =>
 );
 
 
-app.use('/ProfileImage', express.static(path.join(__dirname, 'ProfileImage')));
+// app.use('/ProfileImage', express.static(path.join(__dirname, 'ProfileImage')));
 // app.use('/userAvatars', express.static(path.join(__dirname, '../../assets/userAvatars')));
 
-const storage = multer.diskStorage({
-	destination: './uploads/',
-	filename: (req, file, cb) => {
-	  cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-	}
-  });
+// const storage = multer.diskStorage({
+// 	destination: './uploads/',
+// 	filename: (req, file, cb) => {
+// 	  cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+// 	}
+//   });
   
-  // Init upload
-  const upload = multer({
-	storage: storage,
-	limits: { fileSize: 1000000 }, // Set file size limit (optional)
-	fileFilter: (req, file, cb) => {
-	  checkFileType(file, cb);
-	}
-  }).any(); // .any() to accept all files, you can use .single('fieldname') for specific field
+//   // Init upload
+//   const upload = multer({
+// 	storage: storage,
+// 	limits: { fileSize: 1000000 }, // Set file size limit (optional)
+// 	fileFilter: (req, file, cb) => {
+// 	  checkFileType(file, cb);
+// 	}
+//   }).any(); // .any() to accept all files, you can use .single('fieldname') for specific field
   
-  // Check file type
-  function checkFileType(file, cb) {
-	// Allowed ext
-	const filetypes = /jpeg|jpg|png|gif/;
-	// Check ext
-	const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-	// Check mime
-	const mimetype = filetypes.test(file.mimetype);
+//   // Check file type
+//   function checkFileType(file, cb) {
+// 	// Allowed ext
+// 	const filetypes = /jpeg|jpg|png|gif/;
+// 	// Check ext
+// 	const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+// 	// Check mime
+// 	const mimetype = filetypes.test(file.mimetype);
   
-	if (mimetype && extname) {
-	  return cb(null, true);
-	} else {
-	  cb('Error: Images Only!');
-	}
-  }
+// 	if (mimetype && extname) {
+// 	  return cb(null, true);
+// 	} else {
+// 	  cb('Error: Images Only!');
+// 	}
+//   }
   
-  // Use the multer middleware globally
-  app.use(upload);
+//   // Use the multer middleware globally
+//   app.use(upload);
   
   // Your other middlewares
   app.use(express.json());
@@ -122,7 +124,8 @@ app.use("/activate", activateAccountRoute)
 
 
 const shortid = require('shortid')
-const Razorpay = require('razorpay')
+const Razorpay = require('razorpay');
+const { log } = require("console");
 
 
 
@@ -232,6 +235,37 @@ app.get('/getrefund',  async (req,res)=>{
 		res.json(err);
 	  }
    })
+
+   app.post('/upload', upload.single('profileImage'), (req, res) => {
+	console.log("hello");
+	
+    if (!req.file) {
+        return res.status(400).send({ message: 'Please upload a file.' });
+    }
+
+	console.log(req.body);
+	
+    const profileType = 'vendor';
+	console.log(profileType)
+    let folder = '';
+
+    if (profileType === 'user') {
+        folder = 'UserProfileImg';
+    } else if (profileType === 'vendor') {
+        folder = 'VendorProfileImg';
+    } else {
+        return res.status(400).send({ message: 'Invalid profile type.' });
+    }
+
+    res.send({
+        message: 'File uploaded successfully!',
+        fileName: req.file.filename,
+        filePath: path.join('ProfileImage', folder, req.file.filename)
+    });
+});
+
+app.use('/ProfileImage/UserProfileImg', express.static(path.join(__dirname, 'ProfileImage', 'UserProfileImg')));
+app.use('/ProfileImage/VendorProfileImg', express.static(path.join(__dirname, 'ProfileImage', 'VendorProfileImg')));
 
 
 app.post('/verification', (req, res) => {
