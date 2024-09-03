@@ -1,9 +1,10 @@
 const User = require('../../models/user.model');
 
+
 exports.viewVehicleList = async (req, res) => {
-    const userId = req.userId
+    const userId = req.userId;
     try {
-        const user = await User.findOne({_id:userId })
+        const user = await User.findOne({ _id: userId });
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -11,7 +12,8 @@ exports.viewVehicleList = async (req, res) => {
                 data: null,
             });
         }
-        const vehicleList = user.vehicle;
+
+        const vehicleList = user.vehicle.filter(vehicle => vehicle.isActive !== false);
 
         res.status(200).json( vehicleList,
         );

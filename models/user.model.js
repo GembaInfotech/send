@@ -71,7 +71,10 @@ const userSchema = new Schema(
         isDefault:{
           type:Boolean,
           default:false,
-         
+        },
+        isActive:{
+          type:Boolean,
+          default:true,
         }
       },
     ],

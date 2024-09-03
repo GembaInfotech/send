@@ -11,6 +11,6 @@ const vehicleController = require('../controllers/vehicle.controller')
   router.route('/update-vehicle/:vehicleId').put( decodeToken, vehicleController.update_vehicle);
   router.route('/set-vehicle-default/:vehicleId').put(decodeToken, vehicleController.set_vehicle_default);
   router.route('/view-vehicle-list').get(decodeToken, vehicleController.view_vehicle_list);
-  router.route('/delete-vehicle/:vehicleId').delete(decodeToken, vehicleController.delete_vehicle);
+  router.route('/delete-vehicle/:vehicleId').put(decodeToken, vehicleController.delete_vehicle);
 
 module.exports = router
