@@ -6,7 +6,6 @@ exports.createVehicle = async (req, res) => {
   const { vehicle_name, vehicle_number, vehicle_type, isDefault } = vehicle;
 
   try {
-    // Find the user by their ID
     const user = await UserModel.findOne({ _id: userId });
     if (!user) {
       return res.status(404).json({
@@ -16,28 +15,23 @@ exports.createVehicle = async (req, res) => {
       });
     }
 
-    // Check if this is the first vehicle
     const isFirstVehicle = user.vehicle.length === 0;
 
-    // If isDefault is true, make other vehicles non-default
     if (isDefault) {
       user.vehicle.forEach((v) => {
         v.isDefault = false;
       });
     }
 
-    // Create the new vehicle
     const newVehicle = {
       vehicle_name: vehicle_name.toUpperCase(),
       vehicle_number: vehicle_number.toUpperCase(),
       vehicle_type,
-      isDefault: isFirstVehicle ? true : isDefault || false, // Default to true if it's the first vehicle, otherwise use the provided value
+      isDefault: isFirstVehicle ? true : isDefault || false, 
     };
 
-    // Add the new vehicle to the user's vehicle list
     user.vehicle.push(newVehicle);
 
-    // Save the updated user document
     await user.save();
 
     res.status(201).json({
