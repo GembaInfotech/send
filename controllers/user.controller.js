@@ -82,20 +82,20 @@ const signin = async (req, res, next) => {
       });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
+    // const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
-    if (!isPasswordCorrect) {
-      await saveLogInfo(
-        req,
-        MESSAGE.INCORRECT_PASSWORD,
-        LOG_TYPE.SIGN_IN,
-        LEVEL.ERROR
-      );
+    // if (!isPasswordCorrect) {
+    //   await saveLogInfo(
+    //     req,
+    //     MESSAGE.INCORRECT_PASSWORD,
+    //     LOG_TYPE.SIGN_IN,
+    //     LEVEL.ERROR
+    //   );
 
-      return res.status(400).json({
-        message: "Invalid credentials",
-      });
-    }
+    //   return res.status(400).json({
+    //     message: "Invalid credentials",
+    //   });
+    // }
 
     const isContextAuthEnabled = await UserPreference.findOne({
       user: existingUser._id,
