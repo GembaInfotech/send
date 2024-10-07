@@ -82,20 +82,20 @@ const signin = async (req, res, next) => {
       });
     }
 
-    // const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
+    const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
-    // if (!isPasswordCorrect) {
-    //   await saveLogInfo(
-    //     req,
-    //     MESSAGE.INCORRECT_PASSWORD,
-    //     LOG_TYPE.SIGN_IN,
-    //     LEVEL.ERROR
-    //   );
+    if (!isPasswordCorrect) {
+      await saveLogInfo(
+        req,
+        MESSAGE.INCORRECT_PASSWORD,
+        LOG_TYPE.SIGN_IN,
+        LEVEL.ERROR
+      );
 
-    //   return res.status(400).json({
-    //     message: "Invalid credentials",
-    //   });
-    // }
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
 
     const isContextAuthEnabled = await UserPreference.findOne({
       user: existingUser._id,
@@ -191,6 +191,7 @@ const signin = async (req, res, next) => {
       id: existingUser._id,
       code: existingUser?.code,
       email: existingUser.email,
+      profile:existingUser?.profileImage
     };
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
@@ -216,7 +217,7 @@ const signin = async (req, res, next) => {
         name: existingUser.name,
         email: existingUser.email,
         role: existingUser.role,
-        avatar: existingUser.avatar,
+        profile: existingUser.profileImage,
       },
     });
   } catch (err) {
@@ -388,30 +389,44 @@ const sendActivationEmail = async (email, link) => {
   await transporter.sendMail(mailOptions);
 };
 
- const UploadUserProfile = async(req, res) => {
+const UploadUserProfile = async (req, res) => {
   const userId = req.userId;
   const user = await User.findById(userId);
-  if (!req.file) {
-      return res.status(400).send({ message: 'Please upload a file.' });
+  
+  if (!user) {
+    return res.status(404).send({ message: 'User not found.' });
   }
 
-  const profileType = req.body.profileType || 'user'; // Default to 'vendor' if not provided
+  if (!req.file) {
+    return res.status(400).send({ message: 'Please upload a file.' });
+  }
+
+  const profileType = req.body.profileType || 'user'; 
   let folder = '';
 
   if (profileType === 'user') {
-      folder = 'UserProfileImg';
+    folder = 'UserProfileImg';
   } else if (profileType === 'vendor') {
-      folder = 'VendorProfileImg';
+    folder = 'VendorProfileImg';
   } else {
-      return res.status(400).send({ message: 'Invalid profile type.' });
+    return res.status(400).send({ message: 'Invalid profile type.' });
   }
 
-  res.send({
-      message: 'File uploaded successfully!',
+  user.profileImage = req.file.filename;
+
+  try {
+    await user.save();
+
+    res.send({
+      message: 'File uploaded and saved successfully!',
       fileName: req.file.filename,
       filePath: path.join('ProfileImage', folder, req.file.filename)
-  });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Error saving file info to user profile.' });
+  }
 };
+
 
 
 const changePassword = async (req, res) => {
