@@ -4,7 +4,17 @@ const {updateParkingStatus} = require("../handlers/parkingHandler/updateParkingS
 const {getVendorParkings} = require("../handlers/parkingHandler/getVendorParkings")
 const {updateParking} = require('../handlers/parkingHandler/updateParking')
 const {getParkingByParkingId} = require('../handlers/parkingHandler/getParkingByParkingId')
+const{letsParkAgain} = require('../handlers/parkingHandler/letsParkAgain')
 
+
+
+exports.lets_park_again = async(req,res) =>{
+  try {
+    await letsParkAgain(req,res)
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
 exports.view_Parking_list = async (req, res) => {
   try {
     await viewParkingList(req, res);

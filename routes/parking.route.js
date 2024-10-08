@@ -11,5 +11,6 @@ const decodeToken = require("../middlewares/auth/decodeToken");
   router.route('/search').get(parkingController.view_Parking_list);
   router.route('/get-parking/:parkingId').get(parkingController.get_parking_by_parkingId);
   router.route('/update-parking/:parking_id').put(decodeToken, parkingController.update_parking);
+  router.route('/letsParkAgain').get(decodeToken, parkingController.lets_park_again)
 
   module.exports =router
