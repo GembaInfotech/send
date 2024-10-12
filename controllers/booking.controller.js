@@ -1,6 +1,5 @@
 const {viewBookingList} = require("../handlers/bookingHandler/viewBookingList");
 const {createBooking} = require('../handlers/bookingHandler/createBooking');
-// const {incomingBookingStatus} = require('../handlers/bookingHandler/incomingBookingStatus')
 const {incomingBookingStatus} = require('../handlers/bookingHandler/incomingBookingStatus')
  const {confirmBooking} = require('../handlers/bookingHandler/confirmBookingHandler')
  const {bookingStatus} = require('../handlers/bookingHandler/bookingStatus')

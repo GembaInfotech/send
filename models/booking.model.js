@@ -2,7 +2,7 @@ const { Timestamp } = require("mongodb");
 const mongoose = require("mongoose");
 const bookingSchema = new mongoose.Schema({
   code:{
-    type:String
+    type:String,required:true
   },
   parking: { type: mongoose.Schema.Types.ObjectId, ref: 'Parking' },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
