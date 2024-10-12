@@ -4,27 +4,12 @@ const jwt = require("jsonwebtoken");
 const Token = require("../models/token.model");
 const Post = require("../models/post.model");
 const Community = require("../models/community.model");
-const UserPreference = require("../models/preference.model");
-const formatCreatedAt = require("../utils/timeConverter");
-const { verifyContextData, types } = require("./auth.controller");
-const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const path = require('path');
 const { generateUserCode } = require("../handlers/codeHandler/Code");
 dayjs.extend(duration);
 const nodemailer = require('nodemailer')
-
-const LOG_TYPE = {
-  SIGN_IN: "sign in",
-  LOGOUT: "logout",
-};
-
-const LEVEL = {
-  INFO: "info",
-  ERROR: "error",
-  WARN: "warn",
-};
 
 const MESSAGE = {
   SIGN_IN_ATTEMPT: "User attempting to sign in",
@@ -39,12 +24,6 @@ const MESSAGE = {
 };
 
 const signin = async (req, res, next) => {
-  await saveLogInfo(
-    req,
-    MESSAGE.SIGN_IN_ATTEMPT,
-    LOG_TYPE.SIGN_IN,
-    LEVEL.INFO
-  );
 
   try {
     const { email, password } = req.body;
@@ -53,15 +32,10 @@ const signin = async (req, res, next) => {
       email: { $regex: new RegExp(email, 'i') },
     });
 
-    
-    
+
+
     if (!existingUser) {
-      await saveLogInfo(
-        req,
-        MESSAGE.INCORRECT_EMAIL,
-        LOG_TYPE.SIGN_IN,
-        LEVEL.ERROR
-      );
+
 
       return res.status(404).json({
         message: "Invalid credentials",
@@ -69,109 +43,29 @@ const signin = async (req, res, next) => {
     }
 
     // Check if the account is activated
-    if (!existingUser.isActivated) {
-      await saveLogInfo(
-        req,
-        "Account not activated",
-        LOG_TYPE.SIGN_IN,
-        LEVEL.ERROR
-      );
+    // if (!existingUser.isActivated) {
 
-      return res.status(403).json({
-        message: "Account not activated. Please check your email to activate your account.",
-      });
-    }
+
+
+    //   return res.status(403).json({
+    //     message: "Account not activated. Please check your email to activate your account.",
+    //   });
+    // }
 
     const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
     if (!isPasswordCorrect) {
-      await saveLogInfo(
-        req,
-        MESSAGE.INCORRECT_PASSWORD,
-        LOG_TYPE.SIGN_IN,
-        LEVEL.ERROR
-      );
+
+
 
       return res.status(400).json({
         message: "Invalid credentials",
       });
     }
 
-    const isContextAuthEnabled = await UserPreference.findOne({
-      user: existingUser._id,
-      enableContextBasedAuth: true,
-    });
 
-    if (isContextAuthEnabled) {
-      const contextDataResult = await verifyContextData(req, existingUser);
 
-      if (contextDataResult === types.BLOCKED) {
-        await saveLogInfo(
-          req,
-          MESSAGE.DEVICE_BLOCKED,
-          LOG_TYPE.SIGN_IN,
-          LEVEL.WARN
-        );
 
-        return res.status(401).json({
-          message: "You've been blocked due to suspicious login activity. Please contact support for assistance.",
-        });
-      }
-
-      if (contextDataResult === types.NO_CONTEXT_DATA || contextDataResult === types.ERROR) {
-        await saveLogInfo(
-          req,
-          MESSAGE.CONTEXT_DATA_VERIFY_ERROR,
-          LOG_TYPE.SIGN_IN,
-          LEVEL.ERROR
-        );
-
-        return res.status(500).json({
-          message: "Error occurred while verifying context data",
-        });
-      }
-
-      if (contextDataResult === types.SUSPICIOUS) {
-        await saveLogInfo(
-          req,
-          MESSAGE.MULTIPLE_ATTEMPT_WITHOUT_VERIFY,
-          LOG_TYPE.SIGN_IN,
-          LEVEL.WARN
-        );
-        return res.status(401).json({
-          message: `You've temporarily been blocked due to suspicious login activity. We have already sent a verification email to your registered email address. 
-          Please follow the instructions in the email to verify your identity and gain access to your account.
-
-          Please note that repeated attempts to log in without verifying your identity will result in this device being permanently blocked from accessing your account.
-          
-          Thank you for your cooperation`,
-        });
-      }
-
-      if (contextDataResult.mismatchedProps) {
-        const mismatchedProps = contextDataResult.mismatchedProps;
-        const currentContextData = contextDataResult.currentContextData;
-        if (
-          mismatchedProps.some((prop) =>
-            [
-              "ip",
-              "country",
-              "city",
-              "device",
-              "deviceLOG_TYPE",
-              "os",
-              "platform",
-              "browser",
-            ].includes(prop)
-          )
-        ) {
-          req.mismatchedProps = mismatchedProps;
-          req.currentContextData = currentContextData;
-          req.user = existingUser;
-          return next();
-        }
-      }
-    }
 
     try {
       const existingToken = await Token.findOne({
@@ -191,7 +85,7 @@ const signin = async (req, res, next) => {
       id: existingUser._id,
       code: existingUser?.code,
       email: existingUser.email,
-      profile:existingUser?.profileImage
+      profile: existingUser?.profileImage
     };
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
@@ -221,32 +115,14 @@ const signin = async (req, res, next) => {
       },
     });
   } catch (err) {
-    await saveLogInfo(
-      req,
-      MESSAGE.SIGN_IN_ERROR + err.message,
-      LOG_TYPE.SIGN_IN,
-      LEVEL.ERROR
-    );
+
+
 
     res.status(500).json({
-      message: "Something went wrong",
+      message: "Somethings went wrong",
     });
   }
 };
-
-
-/**
- * Retrieves a user's profile information, including their total number of posts,
- * the number of communities they are in, the number of communities they have posted in,
- * and their duration on the platform.
-
- * @param req - Express request object
- * @param res - Express response object
- * @param {Function} next - Express next function
- * 
- * 
- * 
- */
 
 
 
@@ -306,19 +182,6 @@ const getUser = async (req, res, next) => {
   }
 };
 
-/**
- * Adds a new user to the database with the given name, email, password, and avatar.
- *
- * @description If the email domain of the user's email is "mod.Parkar.com", the user will be
- * assigned the role of "moderator" by default, but not necessarily as a moderator of any community.
- * Otherwise, the user will be assigned the role of "general" user.
- *
- * @param {Object} req.files - The files attached to the request object (for avatar).
- * @param {string} req.body.isConsentGiven - Indicates whether the user has given consent to enable context based auth.
- * @param {Function} next - The next middleware function to call if consent is given by the user to enable context based auth.
- * 
- * 
- */
 
 const addUser = async (req, res) => {
   try {
@@ -330,16 +193,16 @@ const addUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     const code = await generateUserCode();
-      
+
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      code:code
+      code: code
     });
 
     const savedUser = await newUser.save();
-    
+
     if (!savedUser) {
       throw new Error("Failed to add user");
     }
@@ -392,7 +255,7 @@ const sendActivationEmail = async (email, link) => {
 const UploadUserProfile = async (req, res) => {
   const userId = req.userId;
   const user = await User.findById(userId);
-  
+
   if (!user) {
     return res.status(404).send({ message: 'User not found.' });
   }
@@ -401,7 +264,7 @@ const UploadUserProfile = async (req, res) => {
     return res.status(400).send({ message: 'Please upload a file.' });
   }
 
-  const profileType = req.body.profileType || 'user'; 
+  const profileType = req.body.profileType || 'user';
   let folder = '';
 
   if (profileType === 'user') {
@@ -466,18 +329,15 @@ const logout = async (req, res) => {
     console.log(req.headers.authorization)
     if (refreshToken) {
       await Token.deleteOne({ refreshToken });
-      await saveLogInfo(
-        null,
-        MESSAGE.LOGOUT_SUCCESS,
-        LOG_TYPE.LOGOUT,
-        LEVEL.INFO
-      );
+
+
     }
     res.status(200).json({
       message: "Logout successful",
     });
   } catch (err) {
-    await saveLogInfo(null, err.message, LOG_TYPE.LOGOUT, LEVEL.ERROR);
+
+
     res.status(500).json({
       message: "Internal server error. Please try again later.",
     });
@@ -606,6 +466,6 @@ module.exports = {
   getModProfile,
   getUser,
   updateInfo,
-  UploadUserProfile, 
+  UploadUserProfile,
   changePassword,
 };

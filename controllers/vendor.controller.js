@@ -2,7 +2,6 @@ const vendorModel = require('../models/vendor.model')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const vendorToken = require("../models/vendorToken.model")
-const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const { findOne } = require('../models/parking.model');
@@ -12,6 +11,7 @@ const LOG_TYPE = {
     SIGN_IN: "sign in",
     LOGOUT: "logout",
   };
+  
   
   const LEVEL = {
     INFO: "info",
