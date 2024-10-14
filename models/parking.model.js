@@ -68,6 +68,12 @@ const ParkingSchema = new Schema(
       required: false,
       // min:20
     },
+    persistTotalCapacity: {
+      type: Number,
+      required: false,
+      // min:20
+    },
+
     gst:{
       type:String
     },

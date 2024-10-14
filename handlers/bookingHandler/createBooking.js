@@ -17,17 +17,21 @@ exports.createBooking = async (req, res) => {
       sgst,
       cgst,
       transaction_id,
+      
       order_id,
       vehicle_id,
     } = req.body;
 
     // Check for available parking slot and decrement capacity atomically
+    console.log("kine",parking);
+    
     const parkingDetails = await parkingModel.findOneAndUpdate(
       { _id: parking, totalCapacity: { $gt: 0} }, // Ensure there's capacity
       { $inc: { totalCapacity: -1 } }, // Atomically decrement capacity
       { new: true } // Return the updated document
     );
-
+  console.log(  "line", parkingDetails);
+  
     if (!parkingDetails) {
       return res.status(200).json({ msg: "No slots available" });
     }
@@ -47,6 +51,7 @@ exports.createBooking = async (req, res) => {
       outTime,
       price,
       totalPrice,
+      BookingDate:new Date(),
       sgst,
       cgst,
       transaction_id,
