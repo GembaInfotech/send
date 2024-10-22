@@ -84,7 +84,7 @@ db.connect().catch((err) =>
   app.use(express.urlencoded({ extended: false }));
   
 
-app.use(cors());
+app.use(cors({ origin: process.env.React_ORIGIN, credentials: true }));
 app.use(morgan("dev"));
 app.use("/assets/userFiles", express.static(__dirname + "/assets/userFiles"));
 app.use(
@@ -336,4 +336,13 @@ process.on("SIGINT", async () => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server up and running on port ${PORT}!`));
+//Socket test route
+//Socket Config
+const { initializeSocket } = require("./utils/socket");
+const socketTest = require("./controllers/socket.controller");
+app.get("/socket", socketTest);
+
+const server = app.listen(PORT, "0.0.0.0", () => {
+	console.log(`Server up and running on port ${PORT}!`)
+	initializeSocket(server, process.env.React_ORIGIN);
+});
