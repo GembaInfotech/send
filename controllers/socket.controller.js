@@ -5,7 +5,7 @@ const socketTest = async (req, res) => {
   try {
     const chatSocket = getSocket();
     chatSocket.emit("new-msg", {
-      to: "req.userId"
+      userId: "erfwtyuycghebwkjfl"
     })
     // const notification = new Notification({
     //     user: "66cdc27b742428e3703a6fbc",
