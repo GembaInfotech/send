@@ -6,13 +6,18 @@ const jwt = require("jsonwebtoken");
  */
 
 const decodeToken = (req, res, next) => {
+  console.log("header");
+  
   const authHeader = req.headers.authorization;
+  console.log("req.headers.authorization", req.headers.authorization);
+  
   const token = authHeader.split(" ")[1];
   
   try {
     const decoded = jwt.verify(token, process.env.SECRET);
     req.userId = decoded.id;
     req.code = decoded?.code;
+    console.log("hii");
     
     next();
   } catch (err) {

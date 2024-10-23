@@ -12,8 +12,8 @@ const {
   getUser,
   updateInfo,
   changePassword,
-  UploadUserProfile
-
+  UploadUserProfile,
+  sendProfile,
 } = require("../controllers/user.controller");
 
 const {
@@ -33,11 +33,13 @@ const {signUpSignInLimiter,followLimiter} = require("../middlewares/limiter/limi
 const decodeToken = require("../middlewares/auth/decodeToken");
 const requireAuth = passport.authenticate("jwt", { session: false }, null);
 
+router.route('/send-profile/:image').get(sendProfile);
+
 router.get("/public-users/:id", requireAuth, decodeToken, getPublicUser);
 router.get("/public-users",  getPublicUsers);
 router.get("/moderator", requireAuth, decodeToken, getModProfile);
 router.get("/following", requireAuth, decodeToken, getFollowingUsers);
-router.get("/:id", requireAuth, getUser);
+router.get("/:id", getUser);
 
 router.post("/signup",signUpSignInLimiter,addUserValidator,addUserValidatorHandler,addUser,sendVerificationEmail);
 router.post("/refresh-token", refreshToken);
@@ -54,7 +56,7 @@ router.post(
 );
 router.post("/logout", logout);
 
-router.put("/UpdateInfo", requireAuth, decodeToken, updateInfo);
+router.put("/UpdateInfo", decodeToken, updateInfo);
 
 router.use(followLimiter);
 router.patch("/:id/follow", requireAuth, decodeToken, followUser);

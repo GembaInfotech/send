@@ -533,6 +533,20 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const sendProfile = async (req, res) => {
+  const { image } = req.params;
+  const imagePath = path.join(__dirname, '..', 'ProfileImage', 'UserProfileImg', image);
+  console.log(imagePath);
+
+
+  res.sendFile(imagePath, (err) => {
+    if (err) {
+      res.status(404).send('File not found');
+    }
+  });
+}
+
+
 /**
  * @route GET /users/moderator
  */
@@ -608,4 +622,5 @@ module.exports = {
   updateInfo,
   UploadUserProfile, 
   changePassword,
+  sendProfile,
 };
