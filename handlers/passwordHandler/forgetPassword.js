@@ -1,35 +1,29 @@
-const forgetPassword =  require("../../models/forgetPassword.model")
+const forgetPassword = require("../../models/forgetPassword.model")
 const User = require('../../models/user.model')
-const nodemailer = require("../../middlewares/utils/nodemailer")
 const crypto = require("crypto")
 const log = require('../../middlewares/utils/log')
 const response = require("../../middlewares/utils/responseHandle")
+const { sendVerificationEmail } = require('../../middlewares/utils/nodeMailerr.js');
+const {ForgotPasswordTemplate} = require('../../emailTemplate/ForgetPassword.js')
+
 exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
-
     try {
-        
         const user = await User.findOne({
             email: { $eq: email },
-          });
-        
+        });
+
         if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-    }
+            return res.status(404).json({ error: 'User not found' });
+        }
         const forgetToken = crypto.randomBytes(20).toString('hex');
         await forgetPassword.create({ userId: user._id, email: email, token: forgetToken, verified: '0' });
-        const resetUrl = "http://localhost:3000/#/reset-password/" + forgetToken + "/";
-        const Data = {
-            email: email,
-            link: resetUrl
-        }
-        console.log("link", Data.link);
+        const resetUrl = "http://192.168.1.10:4005/#/reset-password/" + forgetToken + "/";
         try {
-            await nodemailer.transporterForResetPass(Data)
-                .then(async () => {
-                    log.dev("Password reset link has been sent to your email id");
-                    return response.throw(200, "Password reset link has been sent to your email id", user, res)
-                })
+            const customizedTemplate = ForgotPasswordTemplate
+                .replace('%NAME%', user.name)
+                .replace('%RESET_LINK%', resetUrl);
+            sendVerificationEmail(user, customizedTemplate);
         } catch (error) {
             log.dev(error);
             return response.throw(202, "Something went please try again!", error, res)
@@ -38,7 +32,7 @@ exports.forgotPassword = async (req, res) => {
     } catch (error) {
         console.error('Error initiating password reset:', error);
         return res.status(500).json({ error: 'Internal server error' });
-      }
+    }
 }
 
 
