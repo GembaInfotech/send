@@ -9,7 +9,7 @@ const decodeToken = (req, res, next) => {
   console.log("header");
   
   const authHeader = req.headers.authorization;
-  console.log("req.headers.authorization", req.headers.authorization);
+  console.log("req.headers.authorization", req.headers);
   
   const token = authHeader.split(" ")[1];
   

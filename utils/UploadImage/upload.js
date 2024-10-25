@@ -2,10 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        
-        
-        const profileType = 'user'; // Get the profile type from the request body
-
+        const profileType = req.body.profileType || 'user'; // 'user' is the default profile type
         let folder = '';
 
         if (profileType === 'user') {
@@ -13,10 +10,10 @@ const storage = multer.diskStorage({
         } else if (profileType === 'vendor') {
             folder = 'VendorProfileImg';
         } else {
-            return cb(new Error('Invalid profile type'));
+            return cb(new Error('Invalid profile type.'));
         }
 
-        cb(null, path.join(__dirname,'..', '..', 'ProfileImage', folder));
+        cb(null, path.join(__dirname, '..', '..', 'ProfileImage', folder));
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -24,23 +21,22 @@ const storage = multer.diskStorage({
     }
 });
 
-// Initialize upload middleware
-const upload = multer({ 
+// File upload middleware
+const upload = multer({
     storage: storage,
-    limits: {
-        fileSize: 1024 * 1024 * 5 // 5 MB file size limit
-    },
+    limits: { fileSize: 1024 * 1024 * 5 }, // 5 MB limit
     fileFilter: function (req, file, cb) {
         const filetypes = /jpeg|jpg|png/;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = filetypes.test(file.mimetype);
 
         if (mimetype && extname) {
-            return cb(null, true);
+            cb(null, true);
         } else {
-            cb(new Error('Only .png, .jpg, and .jpeg format allowed!'));
+            cb(new Error('Only .png, .jpg, and .jpeg formats are allowed!'));
         }
     }
 });
+
 
 module.exports = upload;

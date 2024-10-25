@@ -11,6 +11,8 @@ const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const path = require('path');
+const fs = require('fs');
+
 const { generateUserCode } = require("../handlers/codeHandler/Code");
 dayjs.extend(duration);
 const nodemailer = require('nodemailer')
@@ -389,44 +391,93 @@ const sendActivationEmail = async (email, link) => {
   await transporter.sendMail(mailOptions);
 };
 
-const UploadUserProfile = async (req, res) => {
-  const userId = req.userId;
-  const user = await User.findById(userId);
+// const UploadUserProfile = async (req, res) => {
+//   const userId = req.userId;
+//   const user = await User.findById(userId);
   
-  if (!user) {
-    return res.status(404).send({ message: 'User not found.' });
-  }
+//   if (!user) {
+//     return res.status(404).send({ message: 'User not found.' });
+//   }
 
-  if (!req.file) {
-    return res.status(400).send({ message: 'Please upload a file.' });
-  }
+//   if (!req.file) {
+//     return res.status(400).send({ message: 'Please upload a file.' });
+//   }
 
-  const profileType = req.body.profileType || 'user'; 
-  let folder = '';
+//   const profileType = req.body.profileType || 'user'; 
+//   let folder = '';
 
-  if (profileType === 'user') {
-    folder = 'UserProfileImg';
-  } else if (profileType === 'vendor') {
-    folder = 'VendorProfileImg';
-  } else {
-    return res.status(400).send({ message: 'Invalid profile type.' });
-  }
+//   if (profileType === 'user') {
+//     folder = 'UserProfileImg';
+//   } else if (profileType === 'vendor') {
+//     folder = 'VendorProfileImg';
+//   } else {
+//     return res.status(400).send({ message: 'Invalid profile type.' });
+//   }
 
-  user.profileImage = req.file.filename;
+//   user.profileImage = req.file.filename;
 
+//   try {
+//     await user.save();
+
+//     res.send({
+//       message: 'File uploaded and saved successfully!',
+//       fileName: req.file.filename,
+//       filePath: path.join('ProfileImage', folder, req.file.filename)
+//     });
+//   } catch (error) {
+//     res.status(500).send({ message: 'Error saving file info to user profile.' });
+//   }
+// };
+const UploadUserProfile = async (req, res) => {
+  const userId = req.userId; // Assuming you retrieve this from JWT or session
   try {
-    await user.save();
+      // Fetch the user from the database
+      const user = await User.findById(userId);
 
-    res.send({
-      message: 'File uploaded and saved successfully!',
-      fileName: req.file.filename,
-      filePath: path.join('ProfileImage', folder, req.file.filename)
-    });
+      if (!user) {
+          return res.status(404).send({ message: 'User not found.' });
+      }
+
+      if (!req.file) {
+          return res.status(400).send({ message: 'Please upload a file.' });
+      }
+
+      // Determine the profile folder (user/vendor)
+      const profileType = req.body.profileType || 'user';
+      const folder = profileType === 'vendor' ? 'VendorProfileImg' : 'UserProfileImg';
+      const newImagePath = path.join('ProfileImage', folder, req.file.filename);
+
+      // If the user has an existing profile image, delete the old image
+      
+      if (user.profileImage) {
+          const oldImagePath = path.join(__dirname, '..', 'ProfileImage', folder, user.profileImage);
+
+          if (fs.existsSync(oldImagePath)) {
+              fs.unlink(oldImagePath, (err) => {
+                  if (err) {
+                      console.error('Error deleting old profile image:', err);
+                  } else {
+                      console.log('Old profile image deleted successfully');
+                  }
+              });
+          }
+      }
+
+      // Update the user's profile image path in the database
+      user.profileImage = req.file.filename;
+      await user.save();
+
+      // Send response to the client
+      res.send({
+          message: 'Profile image uploaded/updated successfully!',
+          fileName: req.file.filename,
+          filePath: newImagePath
+      });
   } catch (error) {
-    res.status(500).send({ message: 'Error saving file info to user profile.' });
+      console.error('Error uploading/updating profile image:', error);
+      res.status(500).send({ message: 'Server error while uploading/updating profile image.' });
   }
 };
-
 
 
 const changePassword = async (req, res) => {
