@@ -17,6 +17,9 @@ const { generateUserCode } = require("../handlers/codeHandler/Code");
 dayjs.extend(duration);
 const nodemailer = require('nodemailer')
 
+const { sendVerificationEmail } = require('../middlewares/utils/nodeMailerr.js');
+const {ActivateAccountTemplate} = require('../emailTemplate/ActivateAccount.js');
+
 const LOG_TYPE = {
   SIGN_IN: "sign in",
   LOGOUT: "logout",
@@ -357,8 +360,12 @@ const addUser = async (req, res) => {
     const activationLink = `http://localhost:4005/#/auth/verify/${activationToken}`;
 
     // Send the activation email
-    await sendActivationEmail(savedUser.email, activationLink);
 
+    const customizedTemplate = ActivateAccountTemplate
+                .replace('%NAME%', savedUser.name)
+                .replace('%ACTIVATION_LINK%', activationLink);
+            sendVerificationEmail(savedUser, customizedTemplate);
+    // await sendActivationEmail(savedUser.email, activationLink);
     res.status(201).json({
       message: "User added successfully. Please check your email to activate your account.",
     });
@@ -370,26 +377,26 @@ const addUser = async (req, res) => {
   }
 };
 
-const sendActivationEmail = async (email, link) => {
-  // Add your email sending logic here
-  // For example, using Nodemailer:
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: "surabhiya2001@gmail.com",
-      pass: "efds ijyt hqkv etpc",
-    },
-  });
+// const sendActivationEmail = async (email, link) => {
+//   // Add your email sending logic here
+//   // For example, using Nodemailer:
+//   const transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//       user: "surabhiya2001@gmail.com",
+//       pass: "efds ijyt hqkv etpc",
+//     },
+//   });
 
-  const mailOptions = {
-    from: "prashantrana9516@gmail.com",
-    to: email,
-    subject: 'Activate Your Account',
-    html: `<p>Please click the following link to activate your account:</p><a href="${link}">${link}</a>`,
-  };
+//   const mailOptions = {
+//     from: "prashantrana9516@gmail.com",
+//     to: email,
+//     subject: 'Activate Your Account',
+//     html: `<p>Please click the following link to activate your account:</p><a href="${link}">${link}</a>`,
+//   };
 
-  await transporter.sendMail(mailOptions);
-};
+//   await transporter.sendMail(mailOptions);
+// };
 
 // const UploadUserProfile = async (req, res) => {
 //   const userId = req.userId;
