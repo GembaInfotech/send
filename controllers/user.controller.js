@@ -354,7 +354,7 @@ const addUser = async (req, res) => {
     savedUser.activationToken = activationToken
     savedUser.activationExpires = Date.now() + 3600000
     await savedUser.save()
-    const activationLink = `http://vistaerp.gembainfotech.com:4005/activate/activate-account/${activationToken}`;
+    const activationLink = `http://localhost:4005/#/auth/verify/${activationToken}`;
 
     // Send the activation email
     await sendActivationEmail(savedUser.email, activationLink);
@@ -376,8 +376,8 @@ const sendActivationEmail = async (email, link) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: "prashantrana9516@gmail.com",
-      pass: "qqjsatrjwvbynknu",
+      user: "surabhiya2001@gmail.com",
+      pass: "efds ijyt hqkv etpc",
     },
   });
 

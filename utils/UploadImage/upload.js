@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const profileType = req.body.profileType || 'user'; // 'user' is the default profile type
+        const profileType = req.body.profileType || 'user'; 
         let folder = '';
 
         if (profileType === 'user') {

@@ -8,13 +8,13 @@ exports.activateAccount = async (req, res) => {
 
     const user = await User.findById(decoded.id);
     if (!user) {
-      return res.status(400).json({ message: "Invalid activation link or user does not exist." });
+      return res.status(405).json({ message: "Invalid activation link or user does not exist." });
     }
     if (user.activationExpires < Date.now()) {
-      return res.status(400).json({ message: "Activation token has expired. Please request a new activation link." });
+      return res.status(406).json({ message: "Activation token has expired. Please request a new activation link." });
     }
     if (user.isActivated) {
-      return res.status(400).json({ message: "Account is already activated." });
+      return res.status(407).json({ message: "Account is already activated." });
     }
 
     user.isActivated = true;

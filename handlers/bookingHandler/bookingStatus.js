@@ -17,8 +17,11 @@ exports.bookingStatus = async (req, res) => {
     const now = new Date();
     const inTime = new Date(booking.inTime);
 
+    console.log("inTime", inTime)
+
     // Calculate the difference in hours
-    const hoursDifference = differenceInHours(inTime, now);
+    const hoursDifference = differenceInHours(now, inTime);
+    console.log("hoursDifference", hoursDifference)
 
     if (hoursDifference >= 3) {
       try {
