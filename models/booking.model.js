@@ -8,7 +8,7 @@ const bookingSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   vehicleId: { type: mongoose.Schema.Types.ObjectId },
   vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'VendorModel' },
-
+  vehicle_type : String,
   inTime: {
     type: String,
   },

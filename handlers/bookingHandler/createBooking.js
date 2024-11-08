@@ -19,7 +19,10 @@ exports.createBooking = async (req, res) => {
       transaction_id,
       order_id,
       vehicle_id,
+      vehicle_type,
     } = req.body.bookingData;
+
+    console.log("vehicle_type", vehicle_type)
 
     const parkingDetails = await parkingModel.findById(parking);
     const vendorId = parkingDetails.vendor_id;
@@ -42,6 +45,7 @@ exports.createBooking = async (req, res) => {
       cgst,
       transaction_id,
       order_id,
+      vehicle_type,
     });
 
     try {

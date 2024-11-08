@@ -19,6 +19,7 @@ const guardRoutes = require('./routes/guard.route.js')
 const addressDetailRoute = require('./routes/AddressDetailRoute.js')
 const resetPasswordRoute = require("./routes/forgetPasswordRoute.js")
 const activateAccountRoute = require("./routes/activateAccountRoute.js")
+const couponRoute = require('./routes/couponRoute.js')
 
 const upload = require('./utils/UploadImage/upload.js');
 
@@ -119,6 +120,7 @@ app.use("/booking", paymentRoute)
 app.use("/guard", guardRoutes)
 app.use("/add", addressDetailRoute)
 app.use("/activate", activateAccountRoute)
+app.use('/coupon', couponRoute)
 
 
 
