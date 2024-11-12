@@ -20,7 +20,7 @@ exports.bookingStatus = async (req, res) => {
     console.log("inTime", inTime)
 
     // Calculate the difference in hours
-    const hoursDifference = differenceInHours(now, inTime);
+    const hoursDifference = differenceInHours(inTime, now);
     console.log("hoursDifference", hoursDifference)
 
     if (hoursDifference >= 3) {
