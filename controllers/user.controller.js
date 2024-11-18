@@ -357,7 +357,7 @@ const addUser = async (req, res) => {
     savedUser.activationToken = activationToken
     savedUser.activationExpires = Date.now() + 3600000
     await savedUser.save()
-    const activationLink = `http://localhost:4005/#/auth/verify/${activationToken}`;
+    const activationLink = `http://know2parking.com:4005/#/auth/verify/${activationToken}`;
 
     // Send the activation email
 
