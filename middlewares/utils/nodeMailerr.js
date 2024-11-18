@@ -9,6 +9,7 @@ const transporter = nodemailer.createTransport({
 });
 
 function sendVerificationEmail(user, emailTemplate, subject) {
+  console.log("email sent")
   const mailOptions = {
     from: process.env.EMAIL,
     to: user.email,
