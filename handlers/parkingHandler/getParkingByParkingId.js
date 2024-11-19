@@ -37,6 +37,7 @@ exports.getParkingByParkingId = async (req, res) => {
       outTime: outTime,
     };
     
+    
     console.log("parkingdetails", parking);
 
     res.status(200).json({
