@@ -18,12 +18,13 @@ exports.forgotPassword = async (req, res) => {
         }
         const forgetToken = crypto.randomBytes(20).toString('hex');
         await forgetPassword.create({ userId: user._id, email: email, token: forgetToken, verified: '0' });
-        const resetUrl = "http://192.168.1.10:4005/#/reset-password/" + forgetToken + "/";
+        const resetUrl = "http://know2parking.com:4005/#/reset-password/" + forgetToken + "/";
         try {
             const customizedTemplate = ForgotPasswordTemplate
                 .replace('%NAME%', user.name)
                 .replace('%RESET_LINK%', resetUrl);
             sendVerificationEmail(user, customizedTemplate);
+            return res.status(200).json({ message: 'Password reset email sent successfully' });
         } catch (error) {
             log.dev(error);
             return response.throw(202, "Something went please try again!", error, res)
