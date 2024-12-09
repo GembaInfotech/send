@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const multer = require('multer');
 const path = require('path');
+const admin = require("firebase-admin");
+
 const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
 const postRoutes = require("./routes/post.route");
@@ -20,9 +22,19 @@ const addressDetailRoute = require('./routes/AddressDetailRoute.js')
 const resetPasswordRoute = require("./routes/forgetPasswordRoute.js")
 const activateAccountRoute = require("./routes/activateAccountRoute.js")
 const couponRoute = require('./routes/couponRoute.js')
+const notificationRoute = require('./routes/notificationRoute.js')
 
-const upload = require('./utils/UploadImage/upload.js');
+const FCMTokens = require('./models/FCMToken.model.js')
 
+const upload = require('./utils/UploadImage/upload.js'); 
+
+
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(require("./serviceAccountKey.json")),
+    });
+    console.log("Firebase Admin initialized");
+}
 
 const app = express();
 
@@ -40,6 +52,7 @@ const db = new Database(process.env.MONGODB_URI, {
 db.connect().catch((err) =>
   console.error("Error connecting to database:", err)
 );
+
 
 
 // app.use('/ProfileImage', express.static(path.join(__dirname, 'ProfileImage')));
@@ -121,20 +134,15 @@ app.use("/guard", guardRoutes)
 app.use("/add", addressDetailRoute)
 app.use("/activate", activateAccountRoute)
 app.use('/coupon', couponRoute)
-
-
-
+app.use('/notification', notificationRoute)
 
 const shortid = require('shortid')
 const Razorpay = require('razorpay');
 const { log } = require("console");
 
-
-
 const razorpay = new Razorpay({
-
-	key_id: 'rzp_test_muLBb6gKqfrZA5',
-	key_secret: 'Pr8ALVkn1EA6H7iDMqJY8yVL'
+	key_id: 'rzp_live_6kMhx8CKjR3kUY',
+	key_secret: '9BaBxPbWohwq57nyvQR7VT1d'
 })
 
 app.get('/logo.svg', (req, res) => {
@@ -142,7 +150,6 @@ app.get('/logo.svg', (req, res) => {
 })
 
 app.post('/refund',  async (req,res)=>{
-
  const paymentId = "pay_OOUz4tZyb5bggb"; // change it to dynamically provided payment id 
  async function processRefund(paymentId) {
 	try {
@@ -171,6 +178,36 @@ app.post('/refund',  async (req,res)=>{
   processRefund(paymentId);
 
 })
+
+// app.post("/send-notification", async (req, res) => {
+// 	const { userId, title, body } = req.body;
+// 	if (!userId || !title || !body) return res.status(400).send("Missing fields");
+  
+// 	try {
+// 	  const tokens = await FCMTokens.find({ userId }).select("token");
+// 	  const tokenList = tokens.map((token) => token.token);
+  
+// 	  if (tokenList.length === 0) {
+// 		return res.status(404).send("No tokens found for the user");
+// 	  }
+// 	  const message = {
+// 		notification: {
+// 		  title:title,
+// 		  body: body,
+// 		},
+// 		data: {
+// 		  title: title,
+// 		  body: body,
+// 		},
+// 		token: tokenList[0],
+// 	  };
+//       await admin.messaging().send(message);
+// 	  res.status(200).send(`Notifications sent: `);
+// 	} catch (error) {
+// 	  console.error("Error sending notification:", error);
+// 	  res.status(500).send("Internal Server Error");
+// 	}
+//   });
 app.get('/getrefund',  async (req,res)=>{
 
 	try {
