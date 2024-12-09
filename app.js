@@ -141,8 +141,8 @@ const Razorpay = require('razorpay');
 const { log } = require("console");
 
 const razorpay = new Razorpay({
-	key_id: 'rzp_live_6kMhx8CKjR3kUY',
-	key_secret: '9BaBxPbWohwq57nyvQR7VT1d'
+	key_id: 'rzp_test_yaqYZsLqLJCryh',
+	key_secret: 'lgKMibh7qjtnGouaoVAT4JX1'
 })
 
 app.get('/logo.svg', (req, res) => {
