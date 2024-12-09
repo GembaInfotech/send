@@ -9,7 +9,7 @@ const decodeToken = (req, res, next) => {
   console.log("header");
   
   const authHeader = req.headers.authorization;
-  console.log("req.headers.authorization", req.headers);
+  // console.log("req.headers.authorization", req.headers);
   
   const token = authHeader.split(" ")[1];
   
@@ -17,7 +17,7 @@ const decodeToken = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET);
     req.userId = decoded.id;
     req.code = decoded?.code;
-    console.log("hii");
+    console.log("hii", req.userId);
     
     next();
   } catch (err) {

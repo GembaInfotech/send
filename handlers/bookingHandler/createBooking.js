@@ -1,7 +1,9 @@
 const Booking = require('../../models/booking.model');
 const parkingModel = require('../../models/parking.model');
 const vendorModel = require('../../models/vendor.model');
+const FCMTokens= require('../../models/FCMToken.model')
 const { generateBookingCode } = require('../codeHandler/Code');
+const {sendAndSaveNotification} = require('../../controllers/notification.controller')
 
 exports.createBooking = async (req, res) => {
   try {
@@ -53,6 +55,19 @@ exports.createBooking = async (req, res) => {
       const code = await generateBookingCode();
       savedBooking.code = code;
       await savedBooking.save();
+      // await fetch("http://localhost:4005/send-notification", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     userId,
+      //     title: "Booking Confirmed",
+      //     body: `Your booking for ${parkingDetails.name} is confirmed!`,
+      //   }),
+      // });
+      const tokens = await FCMTokens.find({ userId }).select("token");
+	    const tokenList = tokens.map((token) => token.token);
+
+      sendAndSaveNotification(userId, "Booking Confirmed",`Your booking for ${parkingDetails.name} has been confirmed.`, "booking_confirmed", { bookingId: savedBooking._id, description:"description" }, tokenList[1])
 
       res.status(201).json({ message: true, bookingId: savedBooking._id });
     } catch (err) {
