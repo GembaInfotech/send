@@ -54,7 +54,6 @@ db.connect().catch((err) =>
 );
 
 
-
 // app.use('/ProfileImage', express.static(path.join(__dirname, 'ProfileImage')));
 // app.use('/userAvatars', express.static(path.join(__dirname, '../../assets/userAvatars')));
 
