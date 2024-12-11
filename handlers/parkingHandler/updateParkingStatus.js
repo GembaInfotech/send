@@ -6,13 +6,11 @@ exports.updateParkingStatus = async (req, res) => {
       const {parking_id} = req.params;
       const { status } = req.body;
   
-      // Check if the vendor ID is valid
       const isValidVendor = await ParkingModel.exists({ _id: parking_id, vendor_id: vendor_id });
       if (!isValidVendor) {
         return res.status(404).json({ success: false, message: 'Parking not found for the given vendor ID and parking ID' });
       }
   
-      // Update the status of the parking
       const updatedParking = await ParkingModel.findByIdAndUpdate(parking_id, { status: status }, { new: true });
   
       if (!updatedParking) {
