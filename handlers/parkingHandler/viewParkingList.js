@@ -30,6 +30,16 @@ exports.viewParkingList = async (req, res) => {
 
     }).populate('vendor_id', 'firstName lastName communicationAddress.contact communicationAddress.email');
 
+
+    console.log("parkings", parkings)
+    
+    if (!parkings.length) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      });
+    }
+
     parkings = JSON.parse(JSON.stringify(parkings))
     for (let i = 0; i < parkings.length;) {
       const el = parkings[i];
