@@ -107,6 +107,11 @@ app.use(
 
 app.use(express.json());
 app.use(express.static("build"))
+//comment
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 require("./config/passport.js");
