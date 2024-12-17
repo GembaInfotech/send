@@ -33,8 +33,6 @@ exports.get_parking_by_parkingId = async (req, res) => {
   }
 };
 
-
-
 exports.create_new_parking = async (req, res) => {
     try {
       await createParking(req, res);

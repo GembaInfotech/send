@@ -33,11 +33,11 @@ const applyCoupon = async (req, res) => {
 
     const finalPrice = Math.max(price - discount, 0);
 
-    if (userUsage) {
-      userUsage.usageCount += 1;
-    } else {
-      coupon.usedBy.push({ userId, usageCount: 1 });
-    }
+    // if (userUsage) {
+    //   userUsage.usageCount += 1;
+    // } else {
+    //   coupon.usedBy.push({ userId, usageCount: 1 });
+    // }
 
     await coupon.save();
     console.log("result", finalPrice, discount)

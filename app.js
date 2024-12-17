@@ -3,6 +3,7 @@ const express = require("express");
 const multer = require('multer');
 const path = require('path');
 const admin = require("firebase-admin");
+const Coupon = require('./models/CouponModel.js')
 
 const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
@@ -332,11 +333,23 @@ app.post('/verification', (req, res) => {
 	res.json({ status: 'ok' })
 })
 
-app.post('/razorpay', async (req, res) => {
+app.post('/razorpay', decodeToken, async (req, res) => {
     const payment_capture = 1;
-    const amount = req.body.body;
+	const userId = req.userId
+    const amount = req.body.amt;
+	const couponCode = req.body.couponCode
+	
+	// if(couponCode!=''){
+	// 	const coupon = await Coupon.findOne({ code: couponCode });
+	
+	// const userUsage = coupon.usedBy.find((user) => user.userId.toString() === userId);
 
-	console.log("razorpay", req.body);
+    // if (userUsage && userUsage.usageCount >= coupon.usageLimitPerUser) {
+    //   return res.status(404).json({ message: 'You have already used this coupon the maximum number of times.' });
+    // }
+	// }
+
+	console.log("razorpay", req.body, userId);
 	
     const currency = 'INR';
 

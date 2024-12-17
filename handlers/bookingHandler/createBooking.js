@@ -1,6 +1,7 @@
 const Booking = require('../../models/booking.model');
 const parkingModel = require('../../models/parking.model');
 const vendorModel = require('../../models/vendor.model');
+const Coupon = require('../../models/CouponModel')
 const FCMTokens= require('../../models/FCMToken.model')
 const { generateBookingCode } = require('../codeHandler/Code');
 const {sendAndSaveNotification} = require('../../controllers/notification.controller')
@@ -22,9 +23,10 @@ exports.createBooking = async (req, res) => {
       order_id,
       vehicle_id,
       vehicle_type,
+      couponCode,
     } = req.body.bookingData;
 
-    console.log("vehicle_type", vehicle_type)
+    console.log("vehicle_type", couponCode)
 
     const parkingDetails = await parkingModel.findById(parking);
     const vendorId = parkingDetails.vendor_id;
@@ -48,6 +50,7 @@ exports.createBooking = async (req, res) => {
       transaction_id,
       order_id,
       vehicle_type,
+      couponCode,
     });
 
     try {
@@ -64,6 +67,18 @@ exports.createBooking = async (req, res) => {
       //     body: `Your booking for ${parkingDetails.name} is confirmed!`,
       //   }),
       // });
+
+      if(couponCode != ''){
+        const coupon = await Coupon.findOne({ code: couponCode });
+      const userUsage = coupon.usedBy.find((user) => user.userId.toString() === userId);
+
+      if (userUsage) {
+        userUsage.usageCount += 1;
+      } else {
+        coupon.usedBy.push({ userId, usageCount: 1 });
+      }
+      await coupon.save();
+      }  
       const tokens = await FCMTokens.find({ userId }).select("token");
 	    const tokenList = tokens.map((token) => token.token);
 
