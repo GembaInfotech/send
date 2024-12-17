@@ -336,7 +336,7 @@ app.post('/verification', (req, res) => {
 app.post('/razorpay', decodeToken, async (req, res) => {
     const payment_capture = 1;
 	const userId = req.userId
-    const amount = req.body.amt;
+    const amount = req.body.body;
 	const couponCode = req.body.couponCode
 	
 	// if(couponCode!=''){
