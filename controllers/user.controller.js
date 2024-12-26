@@ -327,55 +327,120 @@ const getUser = async (req, res, next) => {
 
 const addUser = async (req, res) => {
   try {
+    console.log("req.body", req.body);
     if (!req.body.isConsentGiven) {
       return res.status(400).json({
         message: "Your consent for the signup is mandatory.",
       });
     }
+    
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
     const code = await generateUserCode();
-      
+
+    let profileImagePath = null;
+    if (req.file) {
+      const profileType = req.body.profileType || 'user'; 
+      const folder = profileType === 'vendor' ? 'VendorProfileImg' : 'UserProfileImg';
+      profileImagePath = path.join('ProfileImage', folder, req.file.filename);
+    }
+
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      code:code
+      code: code,
+      profileImage: req.file.filename, 
     });
 
     const savedUser = await newUser.save();
-    
+
     if (!savedUser) {
-      throw new Error("Failed to add user");
+      throw new Error('Failed to add user.');
     }
 
+    // Generate activation token
     const activationToken = jwt.sign(
       { id: savedUser._id, email: savedUser.email },
       process.env.SECRET,
-      { expiresIn: "1d" }  // Token valid for 1 day
+      { expiresIn: '1d' } // Token valid for 1 day
     );
-    savedUser.activationToken = activationToken
-    savedUser.activationExpires = Date.now() + 3600000
-    await savedUser.save()
+    savedUser.activationToken = activationToken;
+    savedUser.activationExpires = Date.now() + 3600000; // 1 hour expiry
+    await savedUser.save();
+
+    // Construct the activation link
     const activationLink = `http://know2parking.com:4005/#/auth/verify/${activationToken}`;
 
-    // Send the activation email
-
+    // Send activation email (customize your email sending logic here)
+    // e.g., using Nodemailer and a template engine
     const customizedTemplate = ActivateAccountTemplate
-                .replace('%NAME%', savedUser.name)
-                .replace('%ACTIVATION_LINK%', activationLink);
-            sendVerificationEmail(savedUser, customizedTemplate);
-    // await sendActivationEmail(savedUser.email, activationLink);
+      .replace('%NAME%', savedUser.name)
+      .replace('%ACTIVATION_LINK%', activationLink);
+    sendVerificationEmail(savedUser, customizedTemplate);
+
+    // Respond with success
     res.status(201).json({
-      message: "User added successfully. Please check your email to activate your account.",
+      message: 'User added successfully. Please check your email to activate your account.',
+      user: savedUser,
     });
   } catch (err) {
-    console.error('Error during user addition:', err.message);
+    console.error('Error during user registration:', err.message);
     res.status(400).json({
       message: err.message,
     });
   }
 };
+// const addUser = async (req, res) => {
+//   try {
+//     if (!req.body.isConsentGiven) {
+//       return res.status(400).json({
+//         message: "Your consent for the signup is mandatory.",
+//       });
+//     }
+//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+//     const code = await generateUserCode();
+      
+//     const newUser = new User({
+//       name: req.body.name,
+//       email: req.body.email,
+//       password: hashedPassword,
+//       code:code
+//     });
+
+//     const savedUser = await newUser.save();
+    
+//     if (!savedUser) {
+//       throw new Error("Failed to add user");
+//     }
+
+//     const activationToken = jwt.sign(
+//       { id: savedUser._id, email: savedUser.email },
+//       process.env.SECRET,
+//       { expiresIn: "1d" }  // Token valid for 1 day
+//     );
+//     savedUser.activationToken = activationToken
+//     savedUser.activationExpires = Date.now() + 3600000
+//     await savedUser.save()
+//     const activationLink = `http://know2parking.com:4005/#/auth/verify/${activationToken}`;
+
+//     // Send the activation email
+
+//     const customizedTemplate = ActivateAccountTemplate
+//                 .replace('%NAME%', savedUser.name)
+//                 .replace('%ACTIVATION_LINK%', activationLink);
+//             sendVerificationEmail(savedUser, customizedTemplate);
+//     // await sendActivationEmail(savedUser.email, activationLink);
+//     res.status(201).json({
+//       message: "User added successfully. Please check your email to activate your account.",
+//     });
+//   } catch (err) {
+//     console.error('Error during user addition:', err.message);
+//     res.status(400).json({
+//       message: err.message,
+//     });
+//   }
+// };
 
 // const sendActivationEmail = async (email, link) => {
 //   // Add your email sending logic here

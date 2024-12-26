@@ -41,7 +41,9 @@ router.get("/moderator", requireAuth, decodeToken, getModProfile);
 router.get("/following", requireAuth, decodeToken, getFollowingUsers);
 router.get("/:id", getUser);
 
-router.post("/signup",signUpSignInLimiter,addUserValidator,addUserValidatorHandler,addUser);
+// router.post("/signup",signUpSignInLimiter,addUserValidator,addUserValidatorHandler,addUser);
+router.post("/signup",signUpSignInLimiter,upload.single('profileImage'), addUser);
+
 router.post("/refresh-token", refreshToken);
 router.post("/changePassword", decodeToken, changePassword);
 router.post("/UploadUserProfile", decodeToken, upload.single('profileImage'), UploadUserProfile);
