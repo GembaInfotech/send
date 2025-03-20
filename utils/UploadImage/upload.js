@@ -4,6 +4,7 @@ const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const profileType = req.body.profileType || 'user'; 
         let folder = '';
+
         if (profileType === 'user') {
             folder = 'UserProfileImg';
         } else if (profileType === 'vendor') {
@@ -11,6 +12,7 @@ const storage = multer.diskStorage({
         } else {
             return cb(new Error('Invalid profile type.'));
         }
+
         cb(null, path.join(__dirname, '..', '..', 'ProfileImage', folder));
     },
     filename: function (req, file, cb) {
@@ -19,13 +21,15 @@ const storage = multer.diskStorage({
     }
 });
 
+// File upload middleware
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 1024 * 1024 * 5 },
+    limits: { fileSize: 1024 * 1024 * 5 }, // 5 MB limit
     fileFilter: function (req, file, cb) {
         const filetypes = /jpeg|jpg|png/;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = filetypes.test(file.mimetype);
+
         if (mimetype && extname) {
             cb(null, true);
         } else {
@@ -33,5 +37,6 @@ const upload = multer({
         }
     }
 });
+
 
 module.exports = upload;
